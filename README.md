@@ -1,1 +1,0 @@
-# nextjs-uva-calculator
