@@ -88,7 +88,7 @@ export default function Home() {
                 <CardHeader className="mb-2">
                     <CardTitle tag="h2" className="text-2xl font-semibold text-slate-200">Calculadora</CardTitle>
                     <CardTitle tag="p" className="text-md font-light text-slate-500">
-                        Rellena los datos y haz click en "Calcular" para ver los resultados
+                        Rellena los datos y haz click en &#34;Calcular&#34; para ver los resultados
                     </CardTitle>
                 </CardHeader>
                 <Separator className={"mb-6"} />
@@ -174,7 +174,7 @@ export default function Home() {
                 </CardContent>
             </Card>
 
-            { calculationResults.monthlyPayment != null ?
+            {calculationResults.monthlyPayment != null ?
                 <Card className="bg-slate-800 p-4 mt-12 mb-6">
                     <CardHeader className="mb-2">
                         <CardTitle tag="h2" className="text-2xl font-semibold text-slate-200">Resultados</CardTitle>
