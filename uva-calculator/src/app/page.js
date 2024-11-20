@@ -41,7 +41,7 @@ export default function Home() {
 
     function formatCurrency(value) {
         if (value == null) return "N/A";
-        return `$${new Intl.NumberFormat('es-AR', {
+        return `${new Intl.NumberFormat('es-AR', {
             style: 'decimal',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
