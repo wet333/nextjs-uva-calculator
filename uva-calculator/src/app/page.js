@@ -10,12 +10,15 @@ import {useEffect, useState} from "react";
 import CurrenciesCard from "@/components/components/CurrenciesCard";
 
 export default function Home() {
+    // Currency prices
     const [dollarPrice, setDollarPrice] = useState(0);
     const [uvaPrice, setUvaPrice] = useState(1252.2);
+    // Result's holder
     const [calculationResults, setCalculationResults] = useState({
         monthlyPayment: null,
         totalToPay: null
     });
+    // Input's holder
     const [inputs, setInputs] = useState({
         propertyValue: '',
         financialPercentage: '',
@@ -39,6 +42,7 @@ export default function Home() {
         };
     }
 
+    // Adds decimal points to values, for better readability
     function formatCurrency(value) {
         if (value == null) return "N/A";
         return `${new Intl.NumberFormat('es-AR', {
@@ -64,6 +68,7 @@ export default function Home() {
         fetchDollarPrice().then(() => console.log("Precio del dolar obtenido gracias a dolarapi"));
     }, []);
 
+    // Update input's holder
     const handleInputChange = (e) => {
         const {id, value} = e.target;
         setInputs((prev) => ({
@@ -72,6 +77,7 @@ export default function Home() {
         }));
     };
 
+    // Form action
     const handleCalculate = () => {
         const loanAmount = (inputs.propertyValue * inputs.financialPercentage) / 100;
         const results = calculatePayment(
@@ -101,6 +107,9 @@ export default function Home() {
                                         type="number"
                                         id="propertyValue"
                                         placeholder="Ingrese el valor de la propiedad (USD)"
+                                        min="0"
+                                        max="9999999"
+                                        step="1000"
                                         value={inputs.propertyValue}
                                         onChange={handleInputChange}
                                     />
@@ -181,7 +190,7 @@ export default function Home() {
                     </CardHeader>
                     <Separator className={"mb-6"} />
                     <CardContent>
-                        <div className="grid grid-cols-2 gap-8">
+                        <div className="grid grid-cols-2 gap-6">
                             <CurrenciesCard
                                 title={"Valor de Cuota"}
                                 arsPrice={formatCurrency(calculationResults.monthlyPayment)}
@@ -189,10 +198,22 @@ export default function Home() {
                                 uvaPrice={formatCurrency(calculationResults.monthlyPayment  / uvaPrice)}
                             />
                             <CurrenciesCard
-                                title={"Total Financiado"}
-                                arsPrice={formatCurrency((calculationResults.totalToPay * inputs.financialPercentage) / 100)}
-                                usdPrice={formatCurrency(((calculationResults.totalToPay * inputs.financialPercentage) / 100) / dollarPrice)}
-                                uvaPrice={formatCurrency(((calculationResults.totalToPay * inputs.financialPercentage) / 100) / uvaPrice)}
+                                title={"Ahorros Necesarios"}
+                                arsPrice={formatCurrency(inputs.propertyValue * ((100 - inputs.financialPercentage) / 100) * dollarPrice)}
+                                usdPrice={formatCurrency(inputs.propertyValue * ((100 - inputs.financialPercentage) / 100))}
+                                uvaPrice={formatCurrency(inputs.propertyValue * ((100 - inputs.financialPercentage) / 100) * (dollarPrice / uvaPrice))}
+                            />
+                            <CurrenciesCard
+                                title={"Monto a Recibir"}
+                                arsPrice={formatCurrency(inputs.propertyValue * (inputs.financialPercentage / 100) * dollarPrice)}
+                                usdPrice={formatCurrency(inputs.propertyValue * (inputs.financialPercentage / 100))}
+                                uvaPrice={formatCurrency(inputs.propertyValue * (inputs.financialPercentage / 100) * (dollarPrice / uvaPrice))}
+                            />
+                            <CurrenciesCard
+                                title={"Total a Pagar"}
+                                arsPrice={formatCurrency(calculationResults.totalToPay)}
+                                usdPrice={formatCurrency(calculationResults.totalToPay / dollarPrice)}
+                                uvaPrice={formatCurrency(calculationResults.totalToPay / uvaPrice)}
                             />
                         </div>
                     </CardContent>
