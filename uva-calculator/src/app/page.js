@@ -215,6 +215,12 @@ export default function Home() {
                                 usdPrice={formatCurrency(calculationResults.totalToPay / dollarPrice)}
                                 uvaPrice={formatCurrency(calculationResults.totalToPay / uvaPrice)}
                             />
+                            <CurrenciesCard
+                                title={"Sueldo Requerido"}
+                                arsPrice={formatCurrency(calculationResults.monthlyPayment / 0.3)}
+                                usdPrice={"N/A"}
+                                uvaPrice={"N/A"}
+                            />
                         </div>
                     </CardContent>
                 </Card> : ""
