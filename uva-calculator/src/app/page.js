@@ -6,12 +6,13 @@ import {Percent, DollarSign, CalendarClock} from "lucide-react";
 import InputWithIcon from "@/components/components/InputWithIcon";
 import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
-import {useEffect, useState} from "react";
+import { useState } from "react";
 import CurrenciesCard from "@/components/components/CurrenciesCard";
+import useDollarPrice from "@/hooks/useDollarPrice";
 
 export default function Home() {
     // Currency prices
-    const [dollarPrice, setDollarPrice] = useState(0);
+    const dollarPrice = useDollarPrice();
     const [uvaPrice, setUvaPrice] = useState(1252.2);
     // Result's holder
     const [calculationResults, setCalculationResults] = useState({
@@ -51,22 +52,6 @@ export default function Home() {
             maximumFractionDigits: 0,
         }).format(value)}`;
     }
-
-    useEffect(() => {
-        const fetchDollarPrice = async () => {
-            try {
-                const response = await fetch("https://dolarapi.com/v1/dolares/bolsa");
-                if (!response.ok) {
-                    throw new Error("Failed to fetch dollar price");
-                }
-                const data = await response.json();
-                setDollarPrice(data.venta);
-            } catch (error) {
-                console.error("Error fetching dollar price:", error);
-            }
-        };
-        fetchDollarPrice().then(() => console.log("Precio del dolar obtenido gracias a dolarapi"));
-    }, []);
 
     // Update input's holder
     const handleInputChange = (e) => {
@@ -217,9 +202,7 @@ export default function Home() {
                             />
                             <CurrenciesCard
                                 title={"Sueldo Requerido"}
-                                arsPrice={formatCurrency(calculationResults.monthlyPayment / 0.3)}
-                                usdPrice={"N/A"}
-                                uvaPrice={"N/A"}
+                                arsPrice={formatCurrency(calculationResults.monthlyPayment / 0.25)}
                             />
                         </div>
                     </CardContent>
