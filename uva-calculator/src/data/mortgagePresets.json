@@ -1,0 +1,66 @@
+[
+    {
+        "name": "Banco Nación UVA",
+        "maxFinancialPercentage": 75,
+        "interestRate": 4.5,
+        "minMortgageDuration": 5,
+        "maxMortgageDuration": 30,
+        "salaryPaymentRatio": 25
+    },
+    {
+        "name": "Banco Galicia UVA",
+        "maxFinancialPercentage": 80,
+        "interestRate": 5.5,
+        "minMortgageDuration": 10,
+        "maxMortgageDuration": 30,
+        "salaryPaymentRatio": 25
+    },
+    {
+        "name": "Banco Santander Río UVA",
+        "maxFinancialPercentage": 80,
+        "interestRate": 5.5,
+        "minMortgageDuration": 15,
+        "maxMortgageDuration": 30,
+        "salaryPaymentRatio": 25
+    },
+    {
+        "name": "Banco Macro UVA",
+        "maxFinancialPercentage": 70,
+        "interestRate": 5.5,
+        "minMortgageDuration": 5,
+        "maxMortgageDuration": 20,
+        "salaryPaymentRatio": 25
+    },
+    {
+        "name": "Banco Macro UVA --Linea Joven--",
+        "maxFinancialPercentage": 90,
+        "interestRate": 5.5,
+        "minMortgageDuration": 5,
+        "maxMortgageDuration": 20,
+        "salaryPaymentRatio": 25
+    },
+    {
+        "name": "Banco Macro UVA --Linea Joven + Selecta--",
+        "maxFinancialPercentage": 90,
+        "interestRate": 5.5,
+        "minMortgageDuration": 5,
+        "maxMortgageDuration": 20,
+        "salaryPaymentRatio": 30
+    },
+    {
+        "name": "Banco Ciudad UVA",
+        "maxFinancialPercentage": 75,
+        "interestRate": 5.5,
+        "minMortgageDuration": 10,
+        "maxMortgageDuration": 20,
+        "salaryPaymentRatio": 25
+    },
+    {
+        "name": "Banco Ciudad UVA --Propiedad de CABA--",
+        "maxFinancialPercentage": 75,
+        "interestRate": 3.5,
+        "minMortgageDuration": 10,
+        "maxMortgageDuration": 20,
+        "salaryPaymentRatio": 25
+    }
+]
