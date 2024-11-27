@@ -15,11 +15,11 @@ export default function RootLayout({ children }) {
       <html lang="en" suppressHydrationWarning>
       <head>
           <style>
-              @import
-              url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+              @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
           </style>
           <title>{metadata.title}</title>
       </head>
+
       <body
               className={`antialiased flex flex-col min-h-screen bg-slate-950`}
       >
@@ -27,13 +27,13 @@ export default function RootLayout({ children }) {
               attribute="class"
               defaultTheme="system"
               enableSystem
-          disableTransitionOnChange
+              disableTransitionOnChange
       >
-        <Header/>
-        <main className="flex-grow px-6 py-4">
-          {children}
-        </main>
-        <Footer/>
+          <Header/>
+          <main className="flex-grow px-6 py-4">
+              {children}
+          </main>
+          <Footer/>
       </ThemeProvider>
       </body>
       </html>
