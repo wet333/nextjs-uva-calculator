@@ -116,7 +116,7 @@ export default function Home() {
             <Card className="bg-slate-800 p-4">
                 <CardHeader className="mb-2">
                     <CardTitle tag="h2" className="text-2xl font-semibold text-slate-200">Calculadora</CardTitle>
-                    <CardTitle tag="p" className="text-md font-light text-slate-500">
+                    <CardTitle tag="p" className="text-md font-light text-slate-400">
                         Rellena los datos y haz click en &#34;Calcular&#34; para ver los resultados
                     </CardTitle>
                 </CardHeader>
@@ -125,7 +125,7 @@ export default function Home() {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-1 gap-8">
                             <div>
-                                <label htmlFor="presetSelect" className="flex px-1 mb-3 font-bold text-slate-300">
+                                <label htmlFor="presetSelect" className="flex px-1 mb-3 font-bold text-sm text-slate-300">
                                     Select a Preset:
                                 </label>
                                 <select
@@ -139,7 +139,7 @@ export default function Home() {
                                                 reset(preset);
                                             }
                                         }}
-                                        className="mt-2 block w-full bg-slate-900 border border-slate-800 text-gray-300 py-2 px-3 rounded-md"
+                                        className="mt-2 max-h-[40px] text-sm center block w-full bg-slate-900 border border-slate-800 text-gray-300 py-2 px-3 rounded-md"
                                 >
                                     <option value="">-- No Preset --</option>
                                     {bankPresets.map((preset, index) => (
