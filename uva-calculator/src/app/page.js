@@ -16,7 +16,7 @@ import {
 	usdToArs,
 	usdToUva,
 } from '@/lib/currencyConvertions';
-import bankPresets from './../data/mortageData.json';
+import bankPresets from './../data/mortgageData.json';
 
 export default function Home() {
 	const [results, setResults] = useState(null);
