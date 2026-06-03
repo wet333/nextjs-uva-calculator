@@ -92,6 +92,7 @@
     .section-lead {
         @apply mt-1 text-sm leading-relaxed text-muted-foreground;
     }
+
 }
 
 @layer utilities {
@@ -106,6 +107,28 @@
     .skip-link {
         @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
     }
+}
+
+.currency-label {
+    display: inline-block;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.currency-label--usd {
+    color: #4ade80;
+    text-shadow: 0 0 12px rgb(74 222 128 / 30%);
+}
+
+.currency-label--uva {
+    color: #fb923c;
+    text-shadow: 0 0 12px rgb(251 146 60 / 30%);
+}
+
+.currency-label--ars {
+    color: #38bdf8;
+    text-shadow: 0 0 12px rgb(56 189 248 / 30%);
 }
 
 @media (prefers-reduced-motion: reduce) {

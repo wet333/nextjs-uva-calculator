@@ -23,9 +23,11 @@ function formatRateDate(isoDate) {
     }).format(parsed);
 }
 
-function RateStat({ label, value, date, loading }) {
+function RateStat({ label, value, date, loading, align = "start" }) {
+    const alignClass = align === "end" ? "text-right lg:text-left" : "text-left";
+
     return (
-        <div className="min-w-0 text-right lg:text-left">
+        <div className={`min-w-0 flex-1 lg:flex-none ${alignClass}`}>
             <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 {label}
             </p>
@@ -60,7 +62,7 @@ export function LiveRatesBar({ dollarPrice, uvaPrice, ratesMeta, loading, error 
 
     return (
         <div
-            className="flex w-full items-start justify-between gap-6 sm:justify-end sm:gap-8 lg:w-auto lg:justify-start"
+            className="flex w-full items-stretch lg:w-auto lg:items-start lg:gap-8"
             role="status"
             aria-live="polite"
             aria-busy={loading}
@@ -71,9 +73,10 @@ export function LiveRatesBar({ dollarPrice, uvaPrice, ratesMeta, loading, error 
                 value={formatRateArs(dollarPrice)}
                 date={dollarDate}
                 loading={loading}
+                align="start"
             />
             <div
-                className="hidden h-10 w-px shrink-0 bg-white/[0.08] sm:block"
+                className="mx-3 w-px shrink-0 self-stretch bg-white/[0.08] sm:mx-4 lg:mx-0 lg:h-10 lg:self-auto"
                 aria-hidden="true"
             />
             <RateStat
@@ -81,6 +84,7 @@ export function LiveRatesBar({ dollarPrice, uvaPrice, ratesMeta, loading, error 
                 value={formatRateArs(uvaPrice)}
                 date={uvaDate}
                 loading={loading}
+                align="end"
             />
         </div>
     );

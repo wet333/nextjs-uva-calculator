@@ -7,14 +7,14 @@ import { ResultsPanel } from "@/components/calculator/ResultsPanel";
 
 export const SimulationResults = forwardRef(function SimulationResults({ results }, ref) {
     return (
-        <Card ref={ref} className="scroll-mt-24">
+        <Card ref={ref} className="min-w-0 scroll-mt-24">
             <CardHeader>
                 <CardTitle tag="h2">Resultados de la simulación</CardTitle>
                 <CardDescription>
                     Montos estimados en UVA, USD y ARS según cotización del día.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="min-w-0 pt-0">
                 {results != null ? (
                     <ResultsPanel results={results} />
                 ) : (

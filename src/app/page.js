@@ -52,7 +52,7 @@ export default function HomePage() {
     };
 
     return (
-        <div className="mx-auto max-w-[1200px] space-y-8">
+        <div className="mx-auto min-w-0 max-w-[1200px] space-y-8">
             <SimulationForm
                 selectedPreset={selectedPreset}
                 onPresetChange={setSelectedPreset}
