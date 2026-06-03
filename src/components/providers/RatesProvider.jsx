@@ -1,12 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-    fetchRates,
-    getDollarPrice,
-    getUvaPrice,
-    getRatesMeta,
-} from "@/lib/currencies";
+import { fetchRates, getDollarPrice, getUvaPrice, getRatesMeta } from "@/lib/currencies";
 
 const RatesContext = createContext(null);
 

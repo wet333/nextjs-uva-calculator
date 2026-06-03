@@ -2,8 +2,7 @@ import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const selectStyles =
-    "field-control appearance-none py-2 pl-3 pr-10";
+export const selectStyles = "field-control appearance-none py-2 pl-3 pr-10";
 
 const Select = React.forwardRef(({ className, children, ...props }, ref) => (
     <div className="relative w-full">

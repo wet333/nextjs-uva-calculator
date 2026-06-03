@@ -2,8 +2,7 @@
 
 import { forwardRef, useLayoutEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { formatThousandsDisplay, parseThousandsInput } from "@/lib/utils";
+import { cn, formatThousandsDisplay, parseThousandsInput } from "@/lib/utils";
 
 function getCursorAfterFormat(formatted, digitsBeforeCursor) {
     if (digitsBeforeCursor === 0) {
@@ -23,24 +22,11 @@ function getCursorAfterFormat(formatted, digitsBeforeCursor) {
     return formatted.length;
 }
 
-const FormattedNumberInput = forwardRef(function FormattedNumberInput(
-    {
-        value,
-        onChange,
-        onBlur,
-        className,
-        id,
-        name,
-        placeholder,
-        disabled,
-        max,
-        ...props
-    },
+export const FormattedNumberInput = forwardRef(function FormattedNumberInput(
+    { value, onChange, onBlur, className, id, name, placeholder, disabled, max, ...props },
     ref
 ) {
-    const [displayValue, setDisplayValue] = useState(() =>
-        formatThousandsDisplay(value)
-    );
+    const [displayValue, setDisplayValue] = useState(() => formatThousandsDisplay(value));
     const inputRef = useRef(null);
     const cursorRef = useRef(null);
 
@@ -52,10 +38,7 @@ const FormattedNumberInput = forwardRef(function FormattedNumberInput(
         if (cursorRef.current == null || !inputRef.current) {
             return;
         }
-        inputRef.current.setSelectionRange(
-            cursorRef.current,
-            cursorRef.current
-        );
+        inputRef.current.setSelectionRange(cursorRef.current, cursorRef.current);
         cursorRef.current = null;
     });
 
@@ -71,9 +54,7 @@ const FormattedNumberInput = forwardRef(function FormattedNumberInput(
     const handleChange = (event) => {
         const input = event.target;
         const selectionStart = input.selectionStart ?? 0;
-        const digitsBeforeCursor = input.value
-            .slice(0, selectionStart)
-            .replace(/\D/g, "").length;
+        const digitsBeforeCursor = input.value.slice(0, selectionStart).replace(/\D/g, "").length;
 
         let numeric = parseThousandsInput(input.value);
 
@@ -81,13 +62,9 @@ const FormattedNumberInput = forwardRef(function FormattedNumberInput(
             numeric = max;
         }
 
-        const formatted =
-            numeric === "" ? "" : formatThousandsDisplay(numeric);
+        const formatted = numeric === "" ? "" : formatThousandsDisplay(numeric);
 
-        cursorRef.current = getCursorAfterFormat(
-            formatted,
-            digitsBeforeCursor
-        );
+        cursorRef.current = getCursorAfterFormat(formatted, digitsBeforeCursor);
         setDisplayValue(formatted);
         onChange(numeric === "" ? "" : numeric);
     };
@@ -111,5 +88,3 @@ const FormattedNumberInput = forwardRef(function FormattedNumberInput(
         />
     );
 });
-
-export default FormattedNumberInput;

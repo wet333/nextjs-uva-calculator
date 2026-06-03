@@ -16,16 +16,14 @@ const buttonVariants = cva(
             variant: {
                 default:
                     "bg-primary text-primary-foreground shadow-panel transition-[background-color,box-shadow] duration-150 hover:bg-primary/90 active:bg-primary/80",
-                cta:
-                    "bg-cta text-cta-foreground shadow-panel transition-[background-color,box-shadow] duration-150 hover:bg-cta-hover active:bg-cta-active",
+                cta: "bg-cta text-cta-foreground shadow-panel transition-[background-color,box-shadow] duration-150 hover:bg-cta-hover active:bg-cta-active",
                 destructive:
                     "bg-destructive text-destructive-foreground transition-[background-color] duration-150 hover:bg-destructive/90",
                 outline:
                     "bg-white/[0.03] ring-1 ring-white/[0.08] transition-[background-color,box-shadow] duration-150 hover:bg-white/[0.06] hover:ring-white/[0.12]",
                 secondary:
                     "bg-secondary/80 text-secondary-foreground transition-[background-color] duration-150 hover:bg-secondary",
-                ghost:
-                    "transition-[background-color] duration-150 hover:bg-white/[0.04]",
+                ghost: "transition-[background-color] duration-150 hover:bg-white/[0.04]",
                 link: "text-primary underline-offset-4 transition-[color] duration-150 hover:underline",
             },
             size: {
@@ -44,10 +42,7 @@ const buttonVariants = cva(
 );
 
 const Button = React.forwardRef(
-    (
-        { className, variant, size, asChild = false, type = "button", ...props },
-        ref
-    ) => {
+    ({ className, variant, size, asChild = false, type = "button", ...props }, ref) => {
         const Comp = asChild ? Slot : "button";
         return (
             <Comp

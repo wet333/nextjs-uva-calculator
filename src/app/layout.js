@@ -1,8 +1,8 @@
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/blocks/Header";
-import Footer from "@/components/blocks/Footer";
-import { RatesProvider } from "@/contexts/RatesContext";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { RatesProvider } from "@/components/providers/RatesProvider";
 
 export const metadata = {
     title: "Simulador UVA Hipotecarios",
@@ -16,11 +16,7 @@ export default function RootLayout({ children }) {
             <head>
                 <meta name="theme-color" content="#0c0f14" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link
-                    rel="preconnect"
-                    href="https://fonts.gstatic.com"
-                    crossOrigin="anonymous"
-                />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
             </head>
             <body className="flex min-h-screen flex-col">
                 <RatesProvider>

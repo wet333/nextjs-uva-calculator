@@ -22,9 +22,7 @@ export async function fetchDollarPrice() {
 
 export async function fetchUvaPrice() {
     try {
-        const response = await fetch(
-            "https://api.argentinadatos.com/v1/finanzas/indices/uva"
-        );
+        const response = await fetch("https://api.argentinadatos.com/v1/finanzas/indices/uva");
         if (!response.ok) {
             throw new Error("Failed to fetch UVA price");
         }
@@ -44,10 +42,7 @@ export async function fetchUvaPrice() {
 }
 
 export async function fetchRates() {
-    const results = await Promise.allSettled([
-        fetchDollarPrice(),
-        fetchUvaPrice(),
-    ]);
+    const results = await Promise.allSettled([fetchDollarPrice(), fetchUvaPrice()]);
     const failed = results.filter((r) => r.status === "rejected");
     if (failed.length === results.length) {
         throw new Error("Failed to fetch exchange rates");

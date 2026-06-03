@@ -31,29 +31,19 @@ function RateStat({ label, value, date, loading }) {
             </p>
             <p className="mt-1 text-sm font-semibold tabular-nums text-foreground">
                 {loading ? (
-                    <span className="font-normal text-muted-foreground">
-                        Cargando…
-                    </span>
+                    <span className="font-normal text-muted-foreground">Cargando…</span>
                 ) : (
                     value
                 )}
             </p>
             {!loading && date ? (
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Ref.&nbsp;{date}
-                </p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">{date}</p>
             ) : null}
         </div>
     );
 }
 
-export default function LiveRatesBar({
-    dollarPrice,
-    uvaPrice,
-    ratesMeta,
-    loading,
-    error,
-}) {
+export function LiveRatesBar({ dollarPrice, uvaPrice, ratesMeta, loading, error }) {
     const dollarDate = formatRateDate(ratesMeta?.dollarUpdatedAt);
     const uvaDate = formatRateDate(ratesMeta?.uvaUpdatedAt);
 
@@ -82,7 +72,10 @@ export default function LiveRatesBar({
                 date={dollarDate}
                 loading={loading}
             />
-            <div className="hidden h-10 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden="true" />
+            <div
+                className="hidden h-10 w-px shrink-0 bg-white/[0.08] sm:block"
+                aria-hidden="true"
+            />
             <RateStat
                 label="Valor UVA"
                 value={formatRateArs(uvaPrice)}

@@ -1,14 +1,7 @@
 "use client";
 
-import {
-    Briefcase,
-    Coins,
-    HandCoins,
-    Info,
-    PiggyBank,
-    Receipt,
-} from "lucide-react";
-import { uvaToArs, uvaToUsd } from "@/lib/currencyConvertions";
+import { Briefcase, Coins, HandCoins, Info, PiggyBank, Receipt } from "lucide-react";
+import { uvaToArs, uvaToUsd } from "@/lib/currency-conversions";
 import { formatUva } from "@/lib/utils";
 
 const METRIC_ICONS = {
@@ -79,14 +72,13 @@ function ResultRow({ item }) {
     );
 }
 
-export default function ResultsPanel({ results }) {
+export function ResultsPanel({ results }) {
     return (
         <div className="space-y-4">
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[32rem] border-collapse text-sm">
                     <caption className="sr-only">
-                        Resultados del cálculo en UVA, USD y ARS al tipo de cambio
-                        de hoy
+                        Resultados del cálculo en UVA, USD y ARS al tipo de cambio de hoy
                     </caption>
                     <thead>
                         <tr className="border-b border-white/[0.06]">
@@ -124,14 +116,10 @@ export default function ResultsPanel({ results }) {
                 </table>
             </div>
             <p className="flex items-start gap-2 text-pretty text-xs leading-relaxed text-muted-foreground">
-                <Info
-                    className="mt-0.5 h-3.5 w-3.5 shrink-0"
-                    aria-hidden="true"
-                />
+                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 <span>
-                    Conversiones calculadas con cotización MEP (dolarapi) y valor
-                    UVA publicado por el BCRA. Montos expresados sin impuestos ni
-                    seguros.
+                    Conversiones calculadas con cotización MEP (dolarapi) y valor UVA publicado por
+                    el BCRA. Montos expresados sin impuestos ni seguros.
                 </span>
             </p>
         </div>
