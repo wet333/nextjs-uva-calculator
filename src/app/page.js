@@ -20,9 +20,17 @@ import bankPresets from './../data/mortgageData.json';
 
 export default function Home() {
 	const [results, setResults] = useState(null);
-	const [selectedPreset, setSelectedPreset] = useState(bankPresets);
+	const [selectedPreset, setSelectedPreset] = useState(null);
 	const [dollarPrice, setDollarPrice] = useState(null);
-  const { register, handleSubmit, formState, reset } = useForm();
+	const { register, handleSubmit, formState, reset } = useForm({
+		defaultValues: {
+			propertyValue: '',
+			financialPercentage: '',
+			mortgageDuration: '',
+			interestRate: '',
+			salaryPaymentRatio: '',
+		},
+	});
 
   // Sort Banks by interest_rate_with_salary from lower to highest
   const sortedBankPresets = useMemo(() => {
@@ -177,10 +185,7 @@ export default function Home() {
 									onChange={e => {
 										const presetName = e.target.value;
 										const preset = bankPresets.find(p => p.name === presetName);
-										setSelectedPreset(preset);
-										if (preset) {
-											reset(preset);
-										}
+										setSelectedPreset(preset ?? null);
 									}}
 									className="mt-2 max-h-[40px] text-sm center block w-full bg-slate-900 border border-slate-800 text-gray-300 py-2 px-3 rounded-md"
 								>
@@ -275,7 +280,6 @@ export default function Home() {
 											selectedPreset?.interest_rate_with_salary ? selectedPreset.interest_rate_with_salary : null
 										}
 										step="0.1"
-                    value={selectedPreset?.interest_rate_with_salary}
 										disabled={!!selectedPreset?.interest_rate_with_salary}
 									/>
 								</InputWithIcon>
@@ -304,7 +308,6 @@ export default function Home() {
 												: 35
 										}
 										step="5"
-                    value={selectedPreset?.income_to_loan_ratio}
 										disabled={!!selectedPreset?.income_to_loan_ratio}
 									/>
 								</InputWithIcon>
@@ -321,7 +324,8 @@ export default function Home() {
 										id={'dollarPrice'}
 										type="number"
 										disabled={true}
-										value={dollarPrice ?? 'Precio del Dolar no disponible'}
+										value={dollarPrice ?? ''}
+										placeholder="Precio del Dolar no disponible"
 									/>
 								</InputWithIcon>
 							</div>
