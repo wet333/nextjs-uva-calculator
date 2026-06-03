@@ -9,7 +9,7 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"IBM Plex Sans"', "system-ui", "sans-serif"],
+                sans: ["var(--font-sans)", "system-ui", "sans-serif"],
             },
             colors: {
                 background: "hsl(var(--background))",

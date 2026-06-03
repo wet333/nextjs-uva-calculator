@@ -1,8 +1,17 @@
+import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { RatesProvider } from "@/components/providers/RatesProvider";
+
+const ibmPlexSans = IBM_Plex_Sans({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    style: ["normal", "italic"],
+    variable: "--font-sans",
+    display: "swap",
+});
 
 export const metadata = {
     title: "Simulador UVA Hipotecarios",
@@ -12,13 +21,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="es" className="dark" suppressHydrationWarning>
+        <html lang="es" className={`dark ${ibmPlexSans.variable}`} suppressHydrationWarning>
             <head>
                 <meta name="theme-color" content="#0c0f14" />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
             </head>
-            <body className="flex min-h-screen flex-col">
+            <body className={`${ibmPlexSans.className} flex min-h-screen flex-col`}>
                 <RatesProvider>
                     <ThemeProvider
                         attribute="class"
