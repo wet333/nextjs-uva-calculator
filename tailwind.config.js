@@ -9,7 +9,7 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"DM Sans"', "system-ui", "sans-serif"],
+                sans: ['"IBM Plex Sans"', "system-ui", "sans-serif"],
             },
             colors: {
                 background: "hsl(var(--background))",
@@ -68,8 +68,8 @@ module.exports = {
                 sm: "calc(var(--radius) - 4px)",
             },
             boxShadow: {
-                card: "0 0 0 1px hsl(var(--border)), 0 4px 24px -4px hsl(222 47% 2% / 0.6)",
-                glow: "0 0 20px -4px hsl(var(--glow) / 0.35)",
+                panel: "0 8px 32px -12px hsl(220 22% 2% / 0.55)",
+                "inner-soft": "inset 0 1px 0 hsl(0 0% 100% / 0.03)",
             },
         },
     },

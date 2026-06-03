@@ -8,13 +8,12 @@ import {
 	CalendarClock,
 	Loader2,
 	BarChart3,
+	Landmark,
 } from 'lucide-react';
 import InputWithIcon from '@/components/components/InputWithIcon';
 import FormattedNumberInput from '@/components/components/FormattedNumberInput';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import ResultsPanel from '@/components/components/ResultsPanel';
 import { useForm, Controller } from 'react-hook-form';
@@ -23,8 +22,6 @@ import { arsToUsd, arsToUva, usdToUva } from '@/lib/currencyConvertions';
 import bankPresets from './../data/mortgageData.json';
 import { formatThousandsDisplay } from '@/lib/utils';
 import { useRates } from '@/contexts/RatesContext';
-
-const COMPACT_FIELD = 'h-9 py-1.5 tabular-nums';
 
 const FIELD_ERRORS = {
 	propertyValue: 'Ingresá el valor de la propiedad en USD.',
@@ -197,47 +194,43 @@ export default function Home() {
 	return (
 		<div className="mx-auto max-w-[1200px] space-y-8">
 			<Card>
-				<CardHeader className="space-y-1 p-4 pb-2 sm:p-5">
-					<CardTitle tag="h2" className="text-balance text-xl sm:text-2xl">
-						Calculadora
-					</CardTitle>
+				<CardHeader>
+					<CardTitle tag="h2">Parámetros de simulación</CardTitle>
 					<CardDescription>
-						Completá los datos y presioná Calcular para ver los resultados
+						Ingresá los datos del préstamo. Podés seleccionar un banco para
+						aplicar sus condiciones oficiales.
 					</CardDescription>
 				</CardHeader>
-				<Separator className="mb-0" />
-				<CardContent className="p-4 pt-3 sm:p-5 sm:pt-4">
+				<CardContent className="pt-0">
 					<form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
-						<div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+						<div className="grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2">
 							<div className="col-span-full">
-								<Label
+								<InputWithIcon
+									labelText="Banco"
 									htmlFor="presetSelect"
-									className="mb-1 flex items-center gap-1 px-0.5 text-xs font-medium text-foreground sm:text-sm"
+									icon={Landmark}
 								>
-									Seleccioná un banco
-								</Label>
-								<Select
-									id="presetSelect"
-									name="bankPreset"
-									autoComplete="off"
-									className={COMPACT_FIELD}
-									value={selectedPreset?.name || ''}
-									onChange={e => {
-										const presetName = e.target.value;
-										const preset = bankPresets.find(p => p.name === presetName);
-										setSelectedPreset(preset ?? null);
-									}}
-								>
-									<option value="">Sin restricciones…</option>
-									{sortedBankPresets.map((preset, index) => (
-										<option key={index} value={preset.name}>
-											{preset.name}
-										</option>
-									))}
-								</Select>
+									<Select
+										id="presetSelect"
+										name="bankPreset"
+										autoComplete="off"
+										value={selectedPreset?.name || ''}
+										onChange={e => {
+											const presetName = e.target.value;
+											const preset = bankPresets.find(p => p.name === presetName);
+											setSelectedPreset(preset ?? null);
+										}}
+									>
+										<option value="">Sin restricciones…</option>
+										{sortedBankPresets.map((preset, index) => (
+											<option key={index} value={preset.name}>
+												{preset.name}
+											</option>
+										))}
+									</Select>
+								</InputWithIcon>
 							</div>
 							<InputWithIcon
-								compact
 								labelText="Valor de la Propiedad (USD)"
 								htmlFor="propertyValue"
 								icon={DollarSign}
@@ -273,17 +266,12 @@ export default function Home() {
 													? 'propertyValue-error'
 													: undefined
 											}
-											className={
-												errors.propertyValue
-													? `border-destructive focus-visible:ring-destructive ${COMPACT_FIELD}`
-													: COMPACT_FIELD
-											}
+											className="tabular-nums"
 										/>
 									)}
 								/>
 							</InputWithIcon>
 							<InputWithIcon
-								compact
 								labelText="Porcentaje Financiado"
 								htmlFor="financialPercentage"
 								icon={Percent}
@@ -300,7 +288,7 @@ export default function Home() {
 									placeholder="Ej. 75…"
 									inputMode="numeric"
 									autoComplete="off"
-									className={COMPACT_FIELD}
+									className="tabular-nums"
 									min="0"
 									max={
 										selectedPreset?.financing_percentage
@@ -311,7 +299,6 @@ export default function Home() {
 								/>
 							</InputWithIcon>
 							<InputWithIcon
-								compact
 								labelText="Plazo del Préstamo"
 								htmlFor="mortgageDuration"
 								icon={CalendarClock}
@@ -325,18 +312,13 @@ export default function Home() {
 									id="mortgageDuration"
 									name="mortgageDuration"
 									autoComplete="off"
-									className={
+									aria-invalid={errors.mortgageDuration ? true : undefined}
+									aria-describedby={
 										errors.mortgageDuration
-											? `border-destructive focus-visible:ring-destructive ${COMPACT_FIELD}`
-											: COMPACT_FIELD
+											? 'mortgageDuration-error'
+											: undefined
 									}
-										aria-invalid={errors.mortgageDuration ? true : undefined}
-										aria-describedby={
-											errors.mortgageDuration
-												? 'mortgageDuration-error'
-												: undefined
-										}
-									>
+								>
 										<option value="">Seleccioná el plazo…</option>
 										{loanTermOptions.map(years => (
 											<option key={years} value={years}>
@@ -346,7 +328,6 @@ export default function Home() {
 									</Select>
 							</InputWithIcon>
 							<InputWithIcon
-								compact
 								labelText="Tasa de Interés"
 								htmlFor="interestRate"
 								icon={Percent}
@@ -367,7 +348,7 @@ export default function Home() {
 									placeholder="Ej. 4.5…"
 									inputMode="decimal"
 									autoComplete="off"
-									className={COMPACT_FIELD}
+									className="tabular-nums"
 									min={
 										selectedPreset?.interest_rate_with_salary
 											? selectedPreset.interest_rate_with_salary
@@ -383,7 +364,6 @@ export default function Home() {
 								/>
 							</InputWithIcon>
 							<InputWithIcon
-								compact
 								labelText="Relación Cuota/Sueldo"
 								htmlFor="salaryPaymentRatio"
 								icon={Percent}
@@ -400,7 +380,7 @@ export default function Home() {
 									placeholder="Ej. 25…"
 									inputMode="numeric"
 									autoComplete="off"
-									className={COMPACT_FIELD}
+									className="tabular-nums"
 									min={
 										selectedPreset?.income_to_loan_ratio
 											? selectedPreset.income_to_loan_ratio
@@ -417,14 +397,14 @@ export default function Home() {
 							</InputWithIcon>
 
 							<div
-								className="col-span-full flex flex-col gap-3 border-t border-border/40 pt-3 sm:flex-row sm:items-center sm:justify-between"
+								className="col-span-full flex flex-col-reverse gap-4 pt-2 sm:flex-row sm:items-start sm:justify-between"
 								aria-live="polite"
 								aria-atomic="true"
 							>
 								{submitError ? (
 									<p
 										role="alert"
-										className="flex-1 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+										className="flex-1 rounded-lg bg-destructive/10 px-3 py-2.5 text-sm leading-relaxed text-destructive ring-1 ring-destructive/20"
 									>
 										{submitError}
 									</p>
@@ -434,8 +414,8 @@ export default function Home() {
 								<Button
 									type="submit"
 									variant="cta"
-									size="sm"
-									className="h-9 w-full shrink-0 sm:w-auto sm:min-w-[140px]"
+									size="lg"
+									className="w-full shrink-0 sm:ml-auto sm:w-auto sm:min-w-[160px]"
 									disabled={isSubmitting || ratesLoading}
 									aria-busy={isSubmitting}
 								>
@@ -448,7 +428,7 @@ export default function Home() {
 											Calculando…
 										</>
 									) : (
-										'Calcular'
+										'Calcular simulación'
 									)}
 								</Button>
 							</div>
@@ -457,30 +437,27 @@ export default function Home() {
 				</CardContent>
 			</Card>
 
-			<Card ref={resultsRef} className="scroll-mt-[5.5rem]">
-				<CardHeader className="space-y-1 p-4 pb-2 sm:p-5">
-					<CardTitle tag="h2" className="text-balance text-xl sm:text-2xl">
-						Resultados
-					</CardTitle>
+			<Card ref={resultsRef} className="scroll-mt-24">
+				<CardHeader>
+					<CardTitle tag="h2">Resultados de la simulación</CardTitle>
 					<CardDescription>
-						Montos en UVA, USD y ARS al tipo de cambio de hoy.
+						Montos estimados en UVA, USD y ARS según cotización del día.
 					</CardDescription>
 				</CardHeader>
-				<Separator className="mb-0" />
-				<CardContent className="p-4 pt-3 sm:p-5 sm:pt-4">
+				<CardContent className="pt-0">
 					{results != null ? (
 						<ResultsPanel results={results} />
 					) : (
-						<div className="flex flex-col items-center justify-center gap-3 py-12 text-center sm:py-14">
-							<div
-								className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/80 text-muted-foreground sm:h-14 sm:w-14"
-								aria-hidden="true"
-							>
-								<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7" />
+						<div className="flex flex-col items-center justify-center gap-3 py-14 text-center">
+							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.03] ring-1 ring-white/[0.06]">
+								<BarChart3
+									className="h-5 w-5 text-muted-foreground"
+									aria-hidden="true"
+								/>
 							</div>
 							<p className="max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
-								Completá el formulario y presioná Calcular. Los montos en
-								UVAs aparecerán aquí.
+								Completá los parámetros y presioná Calcular simulación para
+								ver los montos estimados.
 							</p>
 						</div>
 					)}

@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="es" className="dark" suppressHydrationWarning>
             <head>
-                <meta name="theme-color" content="#0a0e17" />
+                <meta name="theme-color" content="#0c0f14" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link
                     rel="preconnect"
@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
                         <main
                             id="main-content"
                             tabIndex={-1}
-                            className="flex-grow px-4 py-6 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-6 lg:px-8"
+                            className="flex-grow px-4 py-8 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-6 sm:py-10 lg:px-8"
                         >
                             {children}
                         </main>

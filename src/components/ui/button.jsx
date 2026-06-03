@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
     [
-        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:pointer-events-none disabled:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -15,24 +15,24 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default:
-                    "bg-primary text-primary-foreground shadow-glow transition-colors hover:bg-primary/90 active:bg-primary/80",
+                    "bg-primary text-primary-foreground shadow-panel transition-[background-color,box-shadow] duration-150 hover:bg-primary/90 active:bg-primary/80",
                 cta:
-                    "rounded-md border border-emerald-700/30 bg-cta font-semibold text-cta-foreground shadow-sm transition-[background-color,border-color,box-shadow] duration-150 hover:border-emerald-500/50 hover:bg-cta-hover hover:shadow-[0_2px_10px_-2px_hsl(168_62%_38%/0.45)] active:border-emerald-700/40 active:bg-cta-active active:shadow-sm",
+                    "bg-cta text-cta-foreground shadow-panel transition-[background-color,box-shadow] duration-150 hover:bg-cta-hover active:bg-cta-active",
                 destructive:
-                    "bg-destructive text-destructive-foreground transition-colors hover:bg-destructive/90",
+                    "bg-destructive text-destructive-foreground transition-[background-color] duration-150 hover:bg-destructive/90",
                 outline:
-                    "border border-border bg-transparent transition-colors hover:bg-secondary hover:text-secondary-foreground",
+                    "bg-white/[0.03] ring-1 ring-white/[0.08] transition-[background-color,box-shadow] duration-150 hover:bg-white/[0.06] hover:ring-white/[0.12]",
                 secondary:
-                    "bg-secondary text-secondary-foreground transition-colors hover:bg-secondary/80",
+                    "bg-secondary/80 text-secondary-foreground transition-[background-color] duration-150 hover:bg-secondary",
                 ghost:
-                    "transition-colors hover:bg-secondary hover:text-secondary-foreground",
-                link: "text-primary underline-offset-4 transition-colors hover:underline",
+                    "transition-[background-color] duration-150 hover:bg-white/[0.04]",
+                link: "text-primary underline-offset-4 transition-[color] duration-150 hover:underline",
             },
             size: {
                 default: "h-10 px-5 py-2",
-                sm: "h-9 rounded-md px-3",
-                lg: "h-11 px-8 text-base",
-                xl: "h-12 px-10 text-base",
+                sm: "h-9 px-4",
+                lg: "h-10 px-6",
+                xl: "h-11 px-8 text-base",
                 icon: "h-10 w-10",
             },
         },

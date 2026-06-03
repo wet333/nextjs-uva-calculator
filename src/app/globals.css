@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,37 +6,36 @@
 
 @layer base {
     :root {
-        --background: 222 47% 5%;
-        --foreground: 210 25% 96%;
-        --card: 222 38% 9%;
-        --card-foreground: 210 25% 96%;
-        --popover: 222 38% 9%;
-        --popover-foreground: 210 25% 96%;
-        --primary: 168 76% 42%;
-        --primary-foreground: 222 47% 5%;
-        --cta: 168 58% 28%;
-        --cta-hover: 168 62% 38%;
-        --cta-active: 168 58% 22%;
+        --background: 220 22% 6%;
+        --foreground: 210 18% 93%;
+        --card: 220 20% 9%;
+        --card-foreground: 210 18% 93%;
+        --popover: 220 20% 10%;
+        --popover-foreground: 210 18% 93%;
+        --primary: 213 55% 52%;
+        --primary-foreground: 0 0% 100%;
+        --cta: 213 50% 42%;
+        --cta-hover: 213 55% 48%;
+        --cta-active: 213 50% 36%;
         --cta-foreground: 0 0% 100%;
-        --secondary: 222 32% 14%;
-        --secondary-foreground: 210 20% 88%;
-        --muted: 222 28% 13%;
-        --muted-foreground: 215 14% 58%;
-        --accent: 168 45% 14%;
-        --accent-foreground: 168 70% 72%;
-        --destructive: 0 72% 51%;
-        --destructive-foreground: 210 25% 98%;
-        --border: 222 24% 18%;
-        --input: 222 30% 12%;
-        --ring: 168 76% 42%;
-        --chart-1: 168 76% 42%;
-        --chart-2: 199 89% 48%;
-        --chart-3: 43 96% 56%;
-        --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%;
+        --secondary: 220 18% 13%;
+        --secondary-foreground: 210 15% 85%;
+        --muted: 220 16% 12%;
+        --muted-foreground: 215 12% 52%;
+        --accent: 220 18% 15%;
+        --accent-foreground: 210 18% 90%;
+        --destructive: 0 65% 48%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 220 14% 16%;
+        --input: 220 18% 10%;
+        --ring: 213 55% 52%;
+        --chart-1: 213 55% 52%;
+        --chart-2: 215 12% 52%;
+        --chart-3: 199 60% 45%;
+        --chart-4: 220 14% 35%;
+        --chart-5: 0 65% 48%;
         --radius: 0.625rem;
-        --surface-elevated: 222 35% 11%;
-        --glow: 168 76% 42%;
+        --surface-elevated: 220 18% 11%;
     }
 }
 
@@ -51,12 +50,11 @@
 
     body {
         @apply bg-background text-foreground antialiased;
-        font-family: "DM Sans", system-ui, sans-serif;
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
         background-image:
-            radial-gradient(ellipse 80% 50% at 50% -20%, hsl(var(--glow) / 0.12), transparent),
-            radial-gradient(ellipse 60% 40% at 100% 100%, hsl(199 89% 48% / 0.06), transparent);
+            radial-gradient(ellipse 70% 45% at 50% -10%, hsl(var(--primary) / 0.07), transparent 60%);
         background-attachment: fixed;
-        -webkit-tap-highlight-color: hsl(var(--primary) / 0.15);
+        -webkit-tap-highlight-color: hsl(var(--primary) / 0.12);
     }
 
     button,
@@ -67,6 +65,33 @@
     [role="button"] {
         touch-action: manipulation;
     }
+
+    select {
+        background-color: hsl(var(--input));
+        color: hsl(var(--foreground));
+    }
+}
+
+@layer components {
+    .surface-panel {
+        @apply rounded-xl bg-card/50 shadow-panel ring-1 ring-white/[0.05];
+    }
+
+    .field-control {
+        @apply flex h-10 w-full rounded-lg bg-input/80 px-3 text-sm text-foreground shadow-inner-soft ring-1 ring-white/[0.06];
+        @apply transition-[box-shadow,background-color] duration-150;
+        @apply hover:bg-input hover:ring-white/[0.09];
+        @apply focus-visible:outline-none focus-visible:bg-input focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+        @apply disabled:cursor-not-allowed disabled:bg-muted/30 disabled:text-muted-foreground disabled:opacity-100 disabled:ring-white/[0.03];
+    }
+
+    .section-heading {
+        @apply text-lg font-semibold tracking-tight text-foreground;
+    }
+
+    .section-lead {
+        @apply mt-1 text-sm leading-relaxed text-muted-foreground;
+    }
 }
 
 @layer utilities {
@@ -74,8 +99,12 @@
         text-wrap: balance;
     }
 
+    .text-pretty {
+        text-wrap: pretty;
+    }
+
     .skip-link {
-        @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+        @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
     }
 }
 

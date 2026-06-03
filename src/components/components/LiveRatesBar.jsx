@@ -1,6 +1,5 @@
 "use client";
 
-import { Banknote, Coins } from "lucide-react";
 import { formatRateArs } from "@/lib/utils";
 
 function formatRateDate(isoDate) {
@@ -24,32 +23,26 @@ function formatRateDate(isoDate) {
     }).format(parsed);
 }
 
-function RateChip({ icon: Icon, label, value, date, loading }) {
+function RateStat({ label, value, date, loading }) {
     return (
-        <div className="flex min-h-[3.25rem] min-w-0 items-center gap-2.5 rounded-lg border border-border/80 bg-muted/40 px-3 py-2">
-            <Icon
-                className="h-4 w-4 shrink-0 text-primary"
-                aria-hidden="true"
-            />
-            <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="text-sm font-semibold tabular-nums">
-                    {loading ? (
-                        <span className="font-normal text-muted-foreground">
-                            Cargando…
-                        </span>
-                    ) : (
-                        <>
-                            {value}
-                            {date ? (
-                                <span className="ml-1 text-xs font-normal text-muted-foreground">
-                                    · {date}
-                                </span>
-                            ) : null}
-                        </>
-                    )}
+        <div className="min-w-0 text-right lg:text-left">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                {label}
+            </p>
+            <p className="mt-1 text-sm font-semibold tabular-nums text-foreground">
+                {loading ? (
+                    <span className="font-normal text-muted-foreground">
+                        Cargando…
+                    </span>
+                ) : (
+                    value
+                )}
+            </p>
+            {!loading && date ? (
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    Ref.&nbsp;{date}
                 </p>
-            </div>
+            ) : null}
         </div>
     );
 }
@@ -68,7 +61,7 @@ export default function LiveRatesBar({
         return (
             <p
                 role="alert"
-                className="max-w-md rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive sm:text-sm"
+                className="w-full rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive ring-1 ring-destructive/20 sm:text-sm lg:w-auto"
             >
                 {error}
             </p>
@@ -77,21 +70,20 @@ export default function LiveRatesBar({
 
     return (
         <div
-            className="flex flex-wrap justify-end gap-2 sm:gap-3"
+            className="flex w-full items-start justify-between gap-6 sm:justify-end sm:gap-8 lg:w-auto lg:justify-start"
             role="status"
             aria-live="polite"
             aria-busy={loading}
-            aria-label="Cotizaciones del día"
+            aria-label="Cotizaciones de referencia del día"
         >
-            <RateChip
-                icon={Banknote}
+            <RateStat
                 label="Dólar MEP"
                 value={formatRateArs(dollarPrice)}
                 date={dollarDate}
                 loading={loading}
             />
-            <RateChip
-                icon={Coins}
+            <div className="hidden h-10 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden="true" />
+            <RateStat
                 label="Valor UVA"
                 value={formatRateArs(uvaPrice)}
                 date={uvaDate}

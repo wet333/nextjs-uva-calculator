@@ -1,4 +1,4 @@
-import React, { Children, cloneElement } from "react";
+import React from "react";
 import { Label } from "@/components/ui/label";
 import { CircleHelp } from "lucide-react";
 import {
@@ -6,19 +6,17 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { cn } from "@/lib/utils";
 
 const helpTooltip = (message) => (
   <HoverCard openDelay={100} closeDelay={200}>
     <HoverCardTrigger asChild>
       <button
         type="button"
-        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label={message}
       >
-        <CircleHelp
-          className="h-4 w-4 translate-x-0.5 -translate-y-px"
-          aria-hidden="true"
-        />
+        <CircleHelp className="h-3.5 w-3.5" aria-hidden="true" />
       </button>
     </HoverCardTrigger>
     <HoverCardContent
@@ -36,66 +34,40 @@ function InputWithIcon({
   htmlFor,
   helpMsg,
   error,
-  compact = false,
   children,
 }) {
   const errorId = error ? `${htmlFor}-error` : undefined;
 
   return (
-    <div className="flex min-w-0 flex-col">
+    <div className="flex min-w-0 flex-col gap-1.5">
       <Label
-        className={
-          compact
-            ? "mb-1 flex items-center gap-1 px-0.5 text-xs font-medium text-foreground sm:text-sm"
-            : "mb-2 flex items-center gap-1.5 px-0.5 text-sm font-medium text-foreground"
-        }
+        className="flex items-center gap-1 text-sm font-medium text-foreground"
         htmlFor={htmlFor}
       >
         {labelText}
         {helpMsg ? helpTooltip(helpMsg) : null}
       </Label>
       <div
-        className={
-          compact
-            ? "group relative w-full [&_input]:h-9 [&_input]:py-1.5 [&_input]:pl-7 [&_select]:h-9 [&_select]:py-1.5 [&_select]:pl-7"
-            : "group relative w-full [&_input]:pl-8 [&_select]:pl-8"
-        }
-      >
-        {Icon && (
-          <div
-            className={
-              compact
-                ? "pointer-events-none absolute inset-y-0 left-0 z-10 flex w-8 items-center justify-center"
-                : "pointer-events-none absolute inset-y-0 left-0 z-10 flex w-10 items-center justify-center"
-            }
-          >
-            <Icon
-              className="h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary"
-              aria-hidden="true"
-            />
-          </div>
+        className={cn(
+          "group relative w-full",
+          Icon && "[&_input]:pl-9 [&_select]:pl-9",
+          "focus-within:[&_.field-icon]:text-primary",
+          error &&
+            "[&_input]:ring-destructive/40 [&_input]:focus-visible:ring-destructive/50 [&_select]:ring-destructive/40 [&_select]:focus-visible:ring-destructive/50"
         )}
-        {Children.map(children, (child) => {
-          if (React.isValidElement(child)) {
-            return cloneElement(child, {
-              className: `${child.props.className || ""} ${error ? "border-destructive focus-visible:ring-destructive" : ""}`,
-              "aria-invalid": error ? true : undefined,
-              "aria-describedby": errorId,
-            });
-          }
-          return child;
-        })}
+      >
+        {Icon ? (
+          <div
+            className="field-icon pointer-events-none absolute left-0 top-0 z-10 flex h-10 w-9 items-center justify-center text-muted-foreground transition-colors duration-150"
+            aria-hidden="true"
+          >
+            <Icon className="h-4 w-4" />
+          </div>
+        ) : null}
+        {children}
       </div>
       {error ? (
-        <p
-          id={errorId}
-          role="alert"
-          className={
-            compact
-              ? "mt-1 text-xs text-destructive"
-              : "mt-1.5 text-sm text-destructive"
-          }
-        >
+        <p id={errorId} role="alert" className="text-xs leading-relaxed text-destructive">
           {error}
         </p>
       ) : null}
