@@ -1,13 +1,18 @@
 import React from "react";
 
-function Footer(props) {
-  return (
-    <footer className="w-full bg-slate-900 py-12 mt-8">
-      <div className="container mx-auto text-center text-white">
-        <p>Creado por Agustin Wet &copy; {new Date().getFullYear()}</p>
-      </div>
-    </footer>
-  );
+function Footer() {
+    return (
+        <footer className="mt-auto border-t border-border/60 bg-card/40 py-6">
+            <div className="mx-auto max-w-[1200px] px-4 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
+                <p>
+                    Creado por Agustin Wet &copy;{" "}
+                    <span suppressHydrationWarning>
+                        {new Date().getFullYear()}
+                    </span>
+                </p>
+            </div>
+        </footer>
+    );
 }
 
 export default Footer;
