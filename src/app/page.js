@@ -1,21 +1,55 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { SimulationForm } from "@/components/calculator/SimulationForm";
 import { SimulationResults } from "@/components/calculator/SimulationResults";
 import { useRates } from "@/components/providers/RatesProvider";
-import { buildSimulationResults } from "@/lib/mortgage/build-simulation-results";
-import { calculatePaymentsArs } from "@/lib/mortgage/calculate-payments";
+import {
+    DEFAULT_SAVINGS_MODE,
+    DEFAULT_TERM_YEARS,
+    extrasPerYearFromStep,
+    SAVINGS_MODE_REDUCE,
+} from "@/constants/mortgage-form";
+import { buildBankComparisons } from "@/lib/mortgage/build-simulation-results";
 
 const RATES_UNAVAILABLE_MESSAGE =
     "Las cotizaciones del dólar MEP y la UVA no están disponibles. Esperá a que carguen o recargá la página.";
 
 export default function HomePage() {
-    const [results, setResults] = useState(null);
-    const [selectedPreset, setSelectedPreset] = useState(null);
+    const [scenario, setScenario] = useState(null);
+    const [extraStepIndex, setExtraStepIndex] = useState(0);
+    const [termYears, setTermYears] = useState(DEFAULT_TERM_YEARS);
+    const [savingsMode, setSavingsMode] = useState(DEFAULT_SAVINGS_MODE);
+    const [propertyValue, setPropertyValue] = useState("");
+    const [propertyCurrency, setPropertyCurrency] = useState("USD");
+    const [selectedBankName, setSelectedBankName] = useState(null);
     const [submitError, setSubmitError] = useState(null);
     const { ready: ratesReady } = useRates();
     const resultsRef = useRef(null);
+
+    const results = useMemo(() => {
+        if (!scenario || !ratesReady) {
+            return null;
+        }
+
+        return buildBankComparisons({
+            ...scenario,
+            termYears,
+            extraStepIndex,
+            extraInstallmentsPerYear: extrasPerYearFromStep(extraStepIndex),
+            savingsMode,
+            propertyValue: savingsMode === SAVINGS_MODE_REDUCE ? propertyValue : "",
+            propertyCurrency,
+        });
+    }, [
+        scenario,
+        extraStepIndex,
+        termYears,
+        savingsMode,
+        propertyValue,
+        propertyCurrency,
+        ratesReady,
+    ]);
 
     const scrollToResults = () => {
         requestAnimationFrame(() => {
@@ -39,27 +73,57 @@ export default function HomePage() {
 
         await new Promise((resolve) => requestAnimationFrame(resolve));
 
-        const loanAmountUsd = (values.propertyValue * values.financialPercentage) / 100;
-
-        const paymentCalculations = calculatePaymentsArs(
-            parseFloat(values.interestRate),
-            loanAmountUsd,
-            parseInt(values.mortgageDuration, 10)
-        );
-
-        setResults(buildSimulationResults(values, paymentCalculations));
+        setScenario({
+            salary: values.salary,
+            salaryCurrency: values.salaryCurrency,
+            savings: values.savings,
+            savingsCurrency: values.savingsCurrency,
+            salaryAccount: values.salaryAccount,
+        });
+        setTermYears(values.termYears);
+        setExtraStepIndex(values.extraStepIndex);
+        setSavingsMode(values.savingsMode);
+        setPropertyValue(values.propertyValue);
+        setPropertyCurrency(values.propertyCurrency);
+        setSelectedBankName(null);
         scrollToResults();
     };
+
+    const selectedName = useMemo(() => {
+        if (!results) {
+            return null;
+        }
+
+        if (selectedBankName && results.some((row) => row.bankName === selectedBankName)) {
+            return selectedBankName;
+        }
+
+        return results.find((row) => row.eligible)?.bankName ?? results[0]?.bankName ?? null;
+    }, [results, selectedBankName]);
 
     return (
         <div className="mx-auto min-w-0 max-w-[1200px] space-y-8">
             <SimulationForm
-                selectedPreset={selectedPreset}
-                onPresetChange={setSelectedPreset}
+                extraStepIndex={extraStepIndex}
+                onExtraStepChange={setExtraStepIndex}
+                termYears={termYears}
+                onTermYearsChange={setTermYears}
+                savingsMode={savingsMode}
+                onSavingsModeChange={setSavingsMode}
+                propertyValue={propertyValue}
+                propertyCurrency={propertyCurrency}
+                onPropertyValueChange={setPropertyValue}
+                onPropertyCurrencyChange={setPropertyCurrency}
                 onSubmit={onSubmit}
                 submitError={submitError}
             />
-            <SimulationResults ref={resultsRef} results={results} />
+            <SimulationResults
+                ref={resultsRef}
+                results={results}
+                selectedBankName={selectedName}
+                onSelectBank={setSelectedBankName}
+                onExtraStepChange={setExtraStepIndex}
+            />
         </div>
     );
 }

@@ -24,7 +24,8 @@ export function Header() {
                             Simulador de Préstamos Hipotecarios UVA
                         </h1>
                         <p className="col-span-2 row-start-2 text-sm mt-1 text-muted-foreground lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:mt-1">
-                            Argentina — estimaciones con datos publicados por entidades financieras
+                            Compará bancos según tu sueldo y ahorros — datos publicados por
+                            entidades financieras
                         </p>
                     </div>
                     <LiveRatesBar

@@ -103,7 +103,7 @@
         "loan_amount_ars": null,
         "financing_percentage": 75,
         "income_to_loan_ratio": 30,
-        "interest_rate_with_salary": 8.5,
+        "interest_rate_with_salary": 7.5,
         "interest_rate_without_salary": null,
         "minimum_income": null,
         "income_with_spouse": "Conyugue o Concubino",

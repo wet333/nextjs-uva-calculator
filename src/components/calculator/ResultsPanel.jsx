@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, Coins, HandCoins, Info, PiggyBank, Receipt } from "lucide-react";
+import { Briefcase, Coins, HandCoins, Home, Info, PiggyBank, Receipt, Wallet } from "lucide-react";
 import { CurrencyLabel } from "@/components/calculator/CurrencyLabel";
 import { uvaToArs, uvaToUsd } from "@/lib/currency-conversions";
 import { formatUva } from "@/lib/utils";
@@ -11,6 +11,10 @@ const METRIC_ICONS = {
     "Monto a Recibir": HandCoins,
     "Total a Pagar": Receipt,
     "Sueldo Requerido": Briefcase,
+    "Propiedad alcanzable": Home,
+    "Valor de la propiedad": Home,
+    "Anticipo necesario": Wallet,
+    "Ahorros aplicados": Wallet,
 };
 
 const CURRENCIES = [
@@ -174,8 +178,8 @@ function ResultsDisclaimer() {
         <p className="flex items-start gap-2 text-pretty text-xs leading-relaxed text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span>
-                Conversiones calculadas con cotización MEP (dolarapi) y valor UVA publicado por el
-                BCRA. Montos expresados sin impuestos ni seguros.
+                Conversiones con cotización MEP (dolarapi) y valor UVA del BCRA. El total a devolver
+                está en UVA de hoy (términos reales). Montos sin impuestos ni seguros.
             </span>
         </p>
     );

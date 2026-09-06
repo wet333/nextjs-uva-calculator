@@ -1,43 +1,38 @@
-import { arsToUva, usdToUva } from "@/lib/currency-conversions";
+import { arsToUva, usdToArs, usdToUva } from "@/lib/currency-conversions";
+import { compareBankRows, evaluateBankAffordability } from "@/lib/mortgage/affordability";
+import { getBankPresets } from "@/lib/mortgage/bank-presets";
 
-function calculateRequiredSavingsUsd(values) {
-    return values.propertyValue * ((100 - values.financialPercentage) / 100);
+function amountToUva(amount, currency) {
+    return currency === "USD" ? usdToUva(amount) : arsToUva(amount);
 }
 
-function calculateLoanAmountUsd(values) {
-    return values.propertyValue * (values.financialPercentage / 100);
+function amountToArs(amount, currency) {
+    return currency === "USD" ? usdToArs(amount) : amount;
 }
 
-function calculateMinimumSalary(monthlyPaymentArs, ratio) {
-    return monthlyPaymentArs / (ratio / 100);
-}
+export function buildBankComparisons(scenario) {
+    const salaryUva = amountToUva(scenario.salary, scenario.salaryCurrency);
+    const salaryArs = amountToArs(scenario.salary, scenario.salaryCurrency);
+    const savingsUva = amountToUva(scenario.savings, scenario.savingsCurrency);
+    const targetPropertyUva =
+        scenario.propertyValue && Number(scenario.propertyValue) > 0
+            ? amountToUva(scenario.propertyValue, scenario.propertyCurrency ?? "USD")
+            : null;
 
-export function buildSimulationResults(values, paymentCalculations) {
-    return [
-        {
-            title: "Valor de Cuota",
-            uvaAmount: arsToUva(paymentCalculations.monthlyPayment),
-        },
-        {
-            title: "Ahorros Necesarios",
-            uvaAmount: usdToUva(calculateRequiredSavingsUsd(values)),
-        },
-        {
-            title: "Monto a Recibir",
-            uvaAmount: usdToUva(calculateLoanAmountUsd(values)),
-        },
-        {
-            title: "Total a Pagar",
-            uvaAmount: arsToUva(paymentCalculations.totalToPay),
-        },
-        {
-            title: "Sueldo Requerido",
-            uvaAmount: arsToUva(
-                calculateMinimumSalary(
-                    paymentCalculations.monthlyPayment,
-                    values.salaryPaymentRatio
-                )
-            ),
-        },
-    ];
+    return getBankPresets()
+        .map((bank) =>
+            evaluateBankAffordability({
+                bank,
+                salaryUva,
+                salaryArs,
+                savingsUva,
+                salaryAccount: scenario.salaryAccount,
+                extraInstallmentsPerYear: scenario.extraInstallmentsPerYear ?? 0,
+                extraStepIndex: scenario.extraStepIndex ?? 0,
+                requestedTermYears: scenario.termYears,
+                savingsMode: scenario.savingsMode ?? "expand",
+                targetPropertyUva,
+            })
+        )
+        .sort(compareBankRows);
 }

@@ -1,54 +1,71 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Percent, DollarSign, CalendarClock, Loader2, Landmark } from "lucide-react";
+import { Briefcase, CalendarClock, Home, Loader2, PiggyBank } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { InputWithIcon } from "@/components/forms/InputWithIcon";
-import { FormattedNumberInput } from "@/components/forms/FormattedNumberInput";
+import { CurrencyAmountInput } from "@/components/forms/CurrencyAmountInput";
+import { ToggleSwitch } from "@/components/forms/ToggleSwitch";
 import { useRates } from "@/components/providers/RatesProvider";
-import { arsToUsd } from "@/lib/currency-conversions";
-import { MORTGAGE_FIELD_ERRORS, MORTGAGE_FORM_DEFAULTS } from "@/constants/mortgage-form";
+import { ExtraInstallmentsSlider } from "@/components/forms/ExtraInstallmentsSlider";
+import { SavingsModeToggle } from "@/components/forms/SavingsModeToggle";
 import {
-    buildLoanTermOptions,
-    findBankPresetByName,
-    getBankPresets,
-    sortBankPresetsBySalaryRate,
-} from "@/lib/mortgage/bank-presets";
-import { formatThousandsDisplay } from "@/lib/utils";
+    LOAN_TERM_OPTIONS,
+    MORTGAGE_FIELD_ERRORS,
+    MORTGAGE_FORM_DEFAULTS,
+    SAVINGS_MODE_REDUCE,
+} from "@/constants/mortgage-form";
 
-export function SimulationForm({ selectedPreset, onPresetChange, onSubmit, submitError }) {
+export function SimulationForm({
+    extraStepIndex,
+    onExtraStepChange,
+    termYears,
+    onTermYearsChange,
+    savingsMode,
+    onSavingsModeChange,
+    propertyValue,
+    propertyCurrency,
+    onPropertyValueChange,
+    onPropertyCurrencyChange,
+    onSubmit,
+    submitError,
+}) {
     const { loading: ratesLoading } = useRates();
 
-    const sortedBankPresets = useMemo(() => sortBankPresetsBySalaryRate(getBankPresets()), []);
-
     const {
-        register,
         handleSubmit,
         control,
         formState: { errors, isSubmitting },
-        reset,
         setFocus,
+        setValue,
     } = useForm({
         defaultValues: MORTGAGE_FORM_DEFAULTS,
     });
 
     useEffect(() => {
-        if (selectedPreset) {
-            reset({
-                propertyValue: "",
-                financialPercentage: selectedPreset.financing_percentage || "",
-                mortgageDuration: selectedPreset.loan_term_years || "",
-                interestRate: selectedPreset.interest_rate_with_salary || "",
-                salaryPaymentRatio: selectedPreset.income_to_loan_ratio || "",
-            });
-        } else {
-            reset(MORTGAGE_FORM_DEFAULTS);
-        }
-    }, [selectedPreset, reset]);
+        setValue("extraStepIndex", extraStepIndex);
+    }, [extraStepIndex, setValue]);
+
+    useEffect(() => {
+        setValue("termYears", termYears);
+    }, [termYears, setValue]);
+
+    useEffect(() => {
+        setValue("savingsMode", savingsMode);
+    }, [savingsMode, setValue]);
+
+    useEffect(() => {
+        setValue("propertyValue", propertyValue);
+    }, [propertyValue, setValue]);
+
+    useEffect(() => {
+        setValue("propertyCurrency", propertyCurrency);
+    }, [propertyCurrency, setValue]);
+
+    const isReduceMode = savingsMode === SAVINGS_MODE_REDUCE;
 
     const onInvalid = (invalidErrors) => {
         const firstKey = Object.keys(invalidErrors)[0];
@@ -57,209 +74,269 @@ export function SimulationForm({ selectedPreset, onPresetChange, onSubmit, submi
         }
     };
 
-    const maxPropertyValue = selectedPreset?.loan_amount_ars
-        ? arsToUsd(selectedPreset.loan_amount_ars)
-        : 999999999;
-
-    const loanTermOptions = useMemo(
-        () => buildLoanTermOptions(selectedPreset?.loan_term_years ?? 30),
-        [selectedPreset]
-    );
-
     return (
         <Card>
             <CardHeader>
-                <CardTitle tag="h2">Parámetros de simulación</CardTitle>
+                <CardTitle tag="h2">Tu escenario</CardTitle>
                 <CardDescription>
-                    Ingresá los datos del préstamo. Podés seleccionar un banco para aplicar sus
-                    condiciones oficiales.
+                    {isReduceMode
+                        ? "Ingresá sueldo, ahorros y el valor de la propiedad. Los ahorros bajan lo que pedís al banco."
+                        : "Ingresá sueldo y ahorros para ver cuánto podrías pedir en cada banco, cuánto recibís y cuánto terminás devolviendo."}
                 </CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
                 <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
                     <div className="grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2">
-                        <div className="col-span-full">
-                            <InputWithIcon labelText="Banco" htmlFor="presetSelect" icon={Landmark}>
-                                <Select
-                                    id="presetSelect"
-                                    name="bankPreset"
-                                    autoComplete="off"
-                                    value={selectedPreset?.name || ""}
-                                    onChange={(e) => {
-                                        onPresetChange(findBankPresetByName(e.target.value));
-                                    }}
-                                >
-                                    <option value="">Sin restricciones…</option>
-                                    {sortedBankPresets.map((preset) => (
-                                        <option key={preset.name} value={preset.name}>
-                                            {preset.name}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </InputWithIcon>
-                        </div>
                         <InputWithIcon
-                            labelText="Valor de la Propiedad (USD)"
-                            htmlFor="propertyValue"
-                            icon={DollarSign}
-                            error={errors.propertyValue?.message}
+                            labelText="Sueldo neto mensual"
+                            htmlFor="salary"
+                            icon={Briefcase}
+                            helpMsg="Ingreso neto mensual del grupo familiar que declararías al banco. Podés expresarlo en pesos o dólares."
+                            error={errors.salary?.message}
                         >
                             <Controller
-                                name="propertyValue"
+                                name="salary"
                                 control={control}
                                 rules={{
-                                    required: MORTGAGE_FIELD_ERRORS.propertyValue,
+                                    required: MORTGAGE_FIELD_ERRORS.salary,
                                     min: {
                                         value: 1,
-                                        message: "El valor debe ser mayor a 0.",
-                                    },
-                                    max: {
-                                        value: maxPropertyValue,
-                                        message: `El valor no puede superar U$D ${formatThousandsDisplay(maxPropertyValue)}.`,
+                                        message: "El sueldo debe ser mayor a 0.",
                                     },
                                 }}
                                 render={({ field }) => (
-                                    <FormattedNumberInput
-                                        id="propertyValue"
-                                        name="propertyValue"
-                                        placeholder="Ej. 150.000…"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        onBlur={field.onBlur}
-                                        ref={field.ref}
-                                        max={maxPropertyValue}
-                                        aria-invalid={errors.propertyValue ? true : undefined}
-                                        aria-describedby={
-                                            errors.propertyValue ? "propertyValue-error" : undefined
-                                        }
-                                        className="tabular-nums"
+                                    <Controller
+                                        name="salaryCurrency"
+                                        control={control}
+                                        render={({ field: currencyField }) => (
+                                            <CurrencyAmountInput
+                                                id="salary"
+                                                name="salary"
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
+                                                inputRef={field.ref}
+                                                currency={currencyField.value}
+                                                onCurrencyChange={currencyField.onChange}
+                                                placeholder={
+                                                    currencyField.value === "USD"
+                                                        ? "Ej. 2.500…"
+                                                        : "Ej. 2.500.000…"
+                                                }
+                                                invalid={!!errors.salary}
+                                                describedBy={
+                                                    errors.salary ? "salary-error" : undefined
+                                                }
+                                                currencyLabelledBy="salary"
+                                                currencyGroupLabel="Moneda del sueldo"
+                                            />
+                                        )}
                                     />
                                 )}
                             />
                         </InputWithIcon>
                         <InputWithIcon
-                            labelText="Porcentaje Financiado"
-                            htmlFor="financialPercentage"
-                            icon={Percent}
-                            error={errors.financialPercentage?.message}
+                            labelText="Ahorros disponibles"
+                            htmlFor="savings"
+                            icon={PiggyBank}
+                            helpMsg={
+                                isReduceMode
+                                    ? "Se restan del valor de la propiedad: eso es lo que pedís al banco, si alcanza el anticipo mínimo."
+                                    : "Capital para el anticipo. Si cubrís lo que el banco no financia, el resto suma al valor de la propiedad."
+                            }
+                            error={errors.savings?.message}
                         >
-                            <Input
-                                {...register("financialPercentage", {
-                                    required: MORTGAGE_FIELD_ERRORS.financialPercentage,
-                                    valueAsNumber: true,
-                                })}
-                                id="financialPercentage"
-                                name="financialPercentage"
-                                type="number"
-                                placeholder="Ej. 75…"
-                                inputMode="numeric"
-                                autoComplete="off"
-                                className="tabular-nums"
-                                min="0"
-                                max={
-                                    selectedPreset?.financing_percentage
-                                        ? selectedPreset.financing_percentage
-                                        : 100
-                                }
-                                step="1"
-                            />
-                        </InputWithIcon>
-                        <InputWithIcon
-                            labelText="Plazo del Préstamo"
-                            htmlFor="mortgageDuration"
-                            icon={CalendarClock}
-                            error={errors.mortgageDuration?.message}
-                        >
-                            <Select
-                                {...register("mortgageDuration", {
-                                    required: MORTGAGE_FIELD_ERRORS.mortgageDuration,
-                                    valueAsNumber: true,
-                                })}
-                                id="mortgageDuration"
-                                name="mortgageDuration"
-                                autoComplete="off"
-                                aria-invalid={errors.mortgageDuration ? true : undefined}
-                                aria-describedby={
-                                    errors.mortgageDuration ? "mortgageDuration-error" : undefined
-                                }
-                            >
-                                <option value="">Seleccioná el plazo…</option>
-                                {loanTermOptions.map((years) => (
-                                    <option key={years} value={years}>
-                                        {years} años
-                                    </option>
-                                ))}
-                            </Select>
-                        </InputWithIcon>
-                        <InputWithIcon
-                            labelText="Tasa de Interés"
-                            htmlFor="interestRate"
-                            icon={Percent}
-                            error={errors.interestRate?.message}
-                        >
-                            <Input
-                                {...register("interestRate", {
-                                    required: MORTGAGE_FIELD_ERRORS.interestRate,
-                                    valueAsNumber: true,
+                            <Controller
+                                name="savings"
+                                control={control}
+                                rules={{
+                                    required: MORTGAGE_FIELD_ERRORS.savings,
                                     min: {
-                                        value: 0,
-                                        message: "La tasa no puede ser negativa.",
+                                        value: 1,
+                                        message: "Los ahorros deben ser mayores a 0.",
                                     },
-                                })}
-                                id="interestRate"
-                                name="interestRate"
-                                type="number"
-                                placeholder="Ej. 4.5…"
-                                inputMode="decimal"
-                                autoComplete="off"
-                                className="tabular-nums"
-                                min={
-                                    selectedPreset?.interest_rate_with_salary
-                                        ? selectedPreset.interest_rate_with_salary
-                                        : 0
-                                }
-                                max={
-                                    selectedPreset?.interest_rate_with_salary
-                                        ? selectedPreset.interest_rate_with_salary
-                                        : undefined
-                                }
-                                step="0.1"
-                                disabled={!!selectedPreset?.interest_rate_with_salary}
+                                }}
+                                render={({ field }) => (
+                                    <Controller
+                                        name="savingsCurrency"
+                                        control={control}
+                                        render={({ field: currencyField }) => (
+                                            <CurrencyAmountInput
+                                                id="savings"
+                                                name="savings"
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
+                                                inputRef={field.ref}
+                                                currency={currencyField.value}
+                                                onCurrencyChange={currencyField.onChange}
+                                                placeholder={
+                                                    currencyField.value === "USD"
+                                                        ? "Ej. 40.000…"
+                                                        : "Ej. 40.000.000…"
+                                                }
+                                                invalid={!!errors.savings}
+                                                describedBy={
+                                                    errors.savings ? "savings-error" : undefined
+                                                }
+                                                currencyLabelledBy="savings"
+                                                currencyGroupLabel="Moneda de los ahorros"
+                                            />
+                                        )}
+                                    />
+                                )}
                             />
                         </InputWithIcon>
                         <InputWithIcon
-                            labelText="Relación Cuota/Sueldo"
-                            htmlFor="salaryPaymentRatio"
-                            icon={Percent}
-                            error={errors.salaryPaymentRatio?.message}
+                            labelText="Plazo del préstamo"
+                            htmlFor="termYears"
+                            icon={CalendarClock}
+                            helpMsg="Cada banco usa este plazo o el máximo que ofrece, el que sea menor. Un plazo más largo baja la cuota y permite pedir más."
+                            error={errors.termYears?.message}
                         >
-                            <Input
-                                {...register("salaryPaymentRatio", {
-                                    required: MORTGAGE_FIELD_ERRORS.salaryPaymentRatio,
-                                    valueAsNumber: true,
-                                })}
-                                id="salaryPaymentRatio"
-                                name="salaryPaymentRatio"
-                                type="number"
-                                placeholder="Ej. 25…"
-                                inputMode="numeric"
-                                autoComplete="off"
-                                className="tabular-nums"
-                                min={
-                                    selectedPreset?.income_to_loan_ratio
-                                        ? selectedPreset.income_to_loan_ratio
-                                        : 25
-                                }
-                                max={
-                                    selectedPreset?.income_to_loan_ratio
-                                        ? selectedPreset.income_to_loan_ratio
-                                        : 35
-                                }
-                                step="5"
-                                disabled={!!selectedPreset?.income_to_loan_ratio}
+                            <Controller
+                                name="termYears"
+                                control={control}
+                                rules={{
+                                    required: MORTGAGE_FIELD_ERRORS.termYears,
+                                }}
+                                render={({ field }) => (
+                                    <Select
+                                        id="termYears"
+                                        name="termYears"
+                                        value={field.value}
+                                        onChange={(event) => {
+                                            const nextValue = Number(event.target.value);
+                                            field.onChange(nextValue);
+                                            onTermYearsChange(nextValue);
+                                        }}
+                                        onBlur={field.onBlur}
+                                        ref={field.ref}
+                                        aria-invalid={errors.termYears ? true : undefined}
+                                        aria-describedby={
+                                            errors.termYears ? "termYears-error" : undefined
+                                        }
+                                    >
+                                        {LOAN_TERM_OPTIONS.map((years) => (
+                                            <option key={years} value={years}>
+                                                {years} años
+                                            </option>
+                                        ))}
+                                    </Select>
+                                )}
                             />
                         </InputWithIcon>
-
+                        <div className="rounded-lg bg-white/[0.02] px-4 py-3 ring-1 ring-white/[0.05]">
+                            <Controller
+                                name="salaryAccount"
+                                control={control}
+                                render={({ field }) => (
+                                    <ToggleSwitch
+                                        id="salaryAccount"
+                                        checked={field.value}
+                                        onChange={field.onChange}
+                                        label="Acredito haberes"
+                                        description="Si cobrás el sueldo en el banco, suele aplicar una tasa más baja."
+                                    />
+                                )}
+                            />
+                        </div>
+                        <div className="col-span-full rounded-lg bg-white/[0.02] px-4 py-3 ring-1 ring-white/[0.05]">
+                            <Controller
+                                name="savingsMode"
+                                control={control}
+                                render={({ field }) => (
+                                    <SavingsModeToggle
+                                        id="savingsMode"
+                                        value={field.value}
+                                        onChange={(nextValue) => {
+                                            field.onChange(nextValue);
+                                            onSavingsModeChange(nextValue);
+                                        }}
+                                    />
+                                )}
+                            />
+                        </div>
+                        {isReduceMode ? (
+                            <div className="col-span-full">
+                                <InputWithIcon
+                                    labelText="Valor de la propiedad"
+                                    htmlFor="propertyValue"
+                                    icon={Home}
+                                    helpMsg="El inmueble que querés comprar. El préstamo es este valor menos tus ahorros, si el banco y tu sueldo alcanzan."
+                                    error={errors.propertyValue?.message}
+                                >
+                                    <Controller
+                                        name="propertyValue"
+                                        control={control}
+                                        rules={{
+                                            required: isReduceMode
+                                                ? MORTGAGE_FIELD_ERRORS.propertyValue
+                                                : false,
+                                            min: isReduceMode
+                                                ? {
+                                                      value: 1,
+                                                      message: "El valor debe ser mayor a 0.",
+                                                  }
+                                                : undefined,
+                                        }}
+                                        render={({ field }) => (
+                                            <Controller
+                                                name="propertyCurrency"
+                                                control={control}
+                                                render={({ field: currencyField }) => (
+                                                    <CurrencyAmountInput
+                                                        id="propertyValue"
+                                                        name="propertyValue"
+                                                        value={field.value}
+                                                        onChange={(nextValue) => {
+                                                            field.onChange(nextValue);
+                                                            onPropertyValueChange(nextValue);
+                                                        }}
+                                                        onBlur={field.onBlur}
+                                                        inputRef={field.ref}
+                                                        currency={currencyField.value}
+                                                        onCurrencyChange={(nextCurrency) => {
+                                                            currencyField.onChange(nextCurrency);
+                                                            onPropertyCurrencyChange(nextCurrency);
+                                                        }}
+                                                        placeholder={
+                                                            currencyField.value === "USD"
+                                                                ? "Ej. 100.000…"
+                                                                : "Ej. 150.000.000…"
+                                                        }
+                                                        invalid={!!errors.propertyValue}
+                                                        describedBy={
+                                                            errors.propertyValue
+                                                                ? "propertyValue-error"
+                                                                : undefined
+                                                        }
+                                                        currencyLabelledBy="propertyValue"
+                                                        currencyGroupLabel="Moneda de la propiedad"
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                </InputWithIcon>
+                            </div>
+                        ) : null}
+                        <div className="col-span-full rounded-lg bg-white/[0.02] px-4 py-3 ring-1 ring-white/[0.05]">
+                            <Controller
+                                name="extraStepIndex"
+                                control={control}
+                                render={({ field }) => (
+                                    <ExtraInstallmentsSlider
+                                        id="extraStepIndex"
+                                        value={field.value}
+                                        onChange={(nextValue) => {
+                                            field.onChange(nextValue);
+                                            onExtraStepChange(nextValue);
+                                        }}
+                                    />
+                                )}
+                            />
+                        </div>
                         <div
                             className="col-span-full flex flex-col-reverse gap-4 pt-2 sm:flex-row sm:items-start sm:justify-between"
                             aria-live="polite"
@@ -289,7 +366,7 @@ export function SimulationForm({ selectedPreset, onPresetChange, onSubmit, submi
                                         Calculando…
                                     </>
                                 ) : (
-                                    "Calcular"
+                                    "Comparar bancos"
                                 )}
                             </Button>
                         </div>

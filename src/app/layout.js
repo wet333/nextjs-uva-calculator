@@ -16,7 +16,7 @@ const ibmPlexSans = IBM_Plex_Sans({
 export const metadata = {
     title: "Simulador UVA Hipotecarios",
     description:
-        "Simulador de Créditos Hipotecarios UVA en Argentina, con condiciones oficiales de diferentes bancos del país",
+        "Simulá el alcance de un crédito hipotecario UVA según tu sueldo y ahorros, y compará bancos de Argentina.",
 };
 
 export default function RootLayout({ children }) {

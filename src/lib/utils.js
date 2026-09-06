@@ -66,3 +66,32 @@ export function formatRateArs(value) {
         maximumFractionDigits: 2,
     }).format(Number(value));
 }
+
+export function formatPercent(value, digits = 1) {
+    if (value == null || Number.isNaN(Number(value))) return "N/A";
+    return `${new Intl.NumberFormat("es-AR", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+    }).format(Number(value))}%`;
+}
+
+export function formatMonthsAsDuration(months) {
+    if (months == null || Number.isNaN(Number(months))) return "N/A";
+
+    const total = Math.max(0, Math.round(Number(months)));
+    const years = Math.floor(total / 12);
+    const remainingMonths = total % 12;
+
+    if (years === 0) {
+        return remainingMonths === 1 ? "1 mes" : `${remainingMonths} meses`;
+    }
+
+    const yearLabel = years === 1 ? "1 año" : `${years} años`;
+
+    if (remainingMonths === 0) {
+        return yearLabel;
+    }
+
+    const monthLabel = remainingMonths === 1 ? "1 mes" : `${remainingMonths} meses`;
+    return `${yearLabel} y ${monthLabel}`;
+}
