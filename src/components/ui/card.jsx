@@ -8,7 +8,7 @@ const Card = React.forwardRef(({ className, ...props }, ref) => (
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("space-y-1 px-6 pt-6 pb-4 sm:px-7", className)} {...props} />
+    <div ref={ref} className={cn("space-y-1 px-6 pt-6 pb-6 sm:px-7", className)} {...props} />
 ));
 CardHeader.displayName = "CardHeader";
 

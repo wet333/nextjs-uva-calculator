@@ -49,7 +49,7 @@ export default function HousesPage() {
                         superficie, y tus notas.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-5 pt-0">
+                <CardContent className="space-y-5 pt-0 pb-1">
                     <NewHouseForm onCreate={onCreate} disabled={!hydrated} />
                     <HousesBackupBar />
                 </CardContent>

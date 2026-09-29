@@ -94,7 +94,7 @@ export function HousesBackupBar() {
                         "Cargando casas guardadas…"
                     )}
                 </p>
-                <div className="flex shrink-0 gap-2">
+                <div className="flex shrink-0 gap-4">
                     <input
                         ref={fileInputRef}
                         type="file"
