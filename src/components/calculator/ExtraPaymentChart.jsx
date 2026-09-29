@@ -91,35 +91,7 @@ export function ExtraPaymentChart({
                 Total a devolver en UVA según la escala de adelantos. La línea punteada es el costo
                 sin adelantar.
             </figcaption>
-            <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                <div className="rounded-lg bg-white/[0.03] px-2.5 py-2 ring-1 ring-white/[0.05]">
-                    <dt className="text-[11px] text-muted-foreground">Adelanto</dt>
-                    <dd className="mt-0.5 text-xs font-semibold leading-snug text-foreground">
-                        {active.label}
-                    </dd>
-                </div>
-                <div className="rounded-lg bg-white/[0.03] px-2.5 py-2 ring-1 ring-white/[0.05]">
-                    <dt className="text-[11px] text-muted-foreground">Total a devolver</dt>
-                    <dd className="mt-0.5 text-xs font-semibold tabular-nums text-foreground">
-                        {formatUva(active.total)} UVA
-                    </dd>
-                </div>
-                <div className="rounded-lg bg-white/[0.03] px-2.5 py-2 ring-1 ring-white/[0.05]">
-                    <dt className="text-[11px] text-muted-foreground">Plazo resultante</dt>
-                    <dd className="mt-0.5 text-xs font-semibold tabular-nums text-foreground">
-                        {formatMonthsAsDuration(active.monthsToPayoff)}
-                    </dd>
-                </div>
-                <div className="rounded-lg bg-white/[0.03] px-2.5 py-2 ring-1 ring-white/[0.05]">
-                    <dt className="text-[11px] text-muted-foreground">Ahorro vs sin adelantar</dt>
-                    <dd className="mt-0.5 text-xs font-semibold tabular-nums text-foreground">
-                        {formatUva(active.interestSaved)} UVA
-                    </dd>
-                    <dd className="text-[11px] text-muted-foreground">
-                        {active.monthsSaved} meses menos
-                    </dd>
-                </div>
-            </dl>
+            {/* Los datos del adelanto elegido se muestran una sola vez, arriba (BankDetailPanel). */}
             <svg
                 viewBox={`0 0 ${width} ${height}`}
                 className="h-auto w-full"

@@ -17,18 +17,28 @@ export function ExtraInstallmentsSlider({
     value,
     onChange,
     description = "Cada cuota extra achica el plazo y reduce intereses. La cuota contractual del banco no cambia.",
+    // Cuando la sección ya muestra título y valor elegido, el encabezado propio sobra.
+    hideHeader = false,
 }) {
     const step = getExtraPaymentStep(value);
     const extraLabel = step.label;
 
     return (
         <div className="flex min-w-0 flex-col gap-2">
-            <div className="flex items-baseline justify-between gap-3">
-                <label htmlFor={id} className="text-sm font-medium text-foreground">
+            {hideHeader ? (
+                <label htmlFor={id} className="sr-only">
                     Adelanto de cuotas
                 </label>
-                <span className="text-right text-xs font-medium text-primary">{extraLabel}</span>
-            </div>
+            ) : (
+                <div className="flex items-baseline justify-between gap-3">
+                    <label htmlFor={id} className="text-sm font-medium text-foreground">
+                        Adelanto de cuotas
+                    </label>
+                    <span className="text-right text-xs font-medium text-primary">
+                        {extraLabel}
+                    </span>
+                </div>
+            )}
             <input
                 id={id}
                 type="range"

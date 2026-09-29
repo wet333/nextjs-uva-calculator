@@ -6,7 +6,9 @@ import { ExtraPaymentChart } from "@/components/calculator/ExtraPaymentChart";
 import { ExtraInstallmentsSlider } from "@/components/forms/ExtraInstallmentsSlider";
 import { Separator } from "@/components/ui/separator";
 import { extraStepLabel, SAVINGS_MODE_REDUCE } from "@/constants/mortgage-form";
-import { formatArs, formatMonthsAsDuration, formatPercent, formatUva } from "@/lib/utils";
+import { uvaToArs } from "@/lib/currency-conversions";
+import { extraPaymentFromInstallments } from "@/lib/mortgage/amortization";
+import { cn, formatArs, formatMonthsAsDuration, formatPercent, formatUva } from "@/lib/utils";
 
 function limitingFactorCopy(row) {
     if (row.savingsMode === SAVINGS_MODE_REDUCE) {
@@ -114,6 +116,34 @@ function BankConditions({ bank, rate, ratio }) {
     );
 }
 
+function StatTile({ label, value, details, highlight }) {
+    return (
+        <div
+            className={cn(
+                "min-w-0 rounded-lg px-3 py-2.5 ring-1",
+                highlight
+                    ? "bg-primary/[0.07] ring-primary/25"
+                    : "bg-white/[0.02] ring-white/[0.05]"
+            )}
+        >
+            <dt className="text-[11px] text-muted-foreground">{label}</dt>
+            <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums text-foreground">
+                {value}
+            </dd>
+            {details.filter(Boolean).map((detail) => (
+                <dd key={detail} className="text-[11px] leading-snug text-muted-foreground">
+                    {detail}
+                </dd>
+            ))}
+        </div>
+    );
+}
+
+/**
+ * Adelantos: un solo lugar para el valor elegido y sus efectos (antes se repetían en el
+ * gráfico). El cálculo reparte los adelantos mes a mes, así que "pagás por mes" es la cuota
+ * base más esa parte, igual que en la simulación.
+ */
 function ExtraPaymentSummary({ row, onExtraStepChange }) {
     const amortization = row.amortization;
 
@@ -121,19 +151,24 @@ function ExtraPaymentSummary({ row, onExtraStepChange }) {
         return null;
     }
 
-    const extraLabel = extraStepLabel(row.extraStepIndex);
+    const hasExtras = row.extraInstallmentsPerYear > 0;
+    const baseUva = amortization.basePaymentUva;
+    const extraUva = extraPaymentFromInstallments(baseUva, row.extraInstallmentsPerYear);
+    const monthlyUva = baseUva + extraUva;
+    // maxPaymentUva = sueldo × (cuota/ingreso), así que el sueldo en UVA se recupera de ahí.
+    const salaryUva = row.ratio > 0 ? row.maxPaymentUva / (row.ratio / 100) : 0;
+    const salaryShare = salaryUva > 0 ? (monthlyUva / salaryUva) * 100 : null;
+    const headingId = "extra-installments-heading";
 
     return (
-        <section className="space-y-4">
-            <div>
-                <h3 className="text-sm font-semibold text-foreground">
-                    Impacto de adelantar cuotas
+        <section aria-labelledby={headingId} className="space-y-3">
+            <div className="flex items-baseline justify-between gap-3">
+                <h3 id={headingId} className="text-sm font-semibold text-foreground">
+                    Adelantar cuotas
                 </h3>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    {row.extraStepIndex === 0
-                        ? "Sin adelantos, pagás el plazo contractual completo. Mové el control o tocá el gráfico para ver el ahorro."
-                        : `Escenario: ${extraLabel}.`}
-                </p>
+                <span className="text-right text-xs font-medium text-primary">
+                    {extraStepLabel(row.extraStepIndex)}
+                </span>
             </div>
             {onExtraStepChange ? (
                 <ExtraInstallmentsSlider
@@ -141,36 +176,46 @@ function ExtraPaymentSummary({ row, onExtraStepChange }) {
                     value={row.extraStepIndex}
                     onChange={onExtraStepChange}
                     description=""
+                    hideHeader
                 />
             ) : null}
-            <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-lg bg-white/[0.02] px-3 py-3 ring-1 ring-white/[0.05]">
-                    <dt className="text-[11px] text-muted-foreground">Plazo resultante</dt>
-                    <dd className="mt-1 text-sm font-semibold tabular-nums">
-                        {formatMonthsAsDuration(amortization.monthsToPayoff)}
-                    </dd>
-                    <dd className="mt-0.5 text-[11px] text-muted-foreground">
-                        Contrato: {formatMonthsAsDuration(amortization.scheduledMonths)}
-                    </dd>
-                </div>
-                <div className="rounded-lg bg-white/[0.02] px-3 py-3 ring-1 ring-white/[0.05]">
-                    <dt className="text-[11px] text-muted-foreground">Meses ahorrados</dt>
-                    <dd className="mt-1 text-sm font-semibold tabular-nums">
-                        {amortization.monthsSaved}
-                    </dd>
-                    <dd className="mt-0.5 text-[11px] text-muted-foreground">
-                        Intereses: {formatUva(amortization.interestSavedUva)} UVA
-                    </dd>
-                </div>
-                <div className="rounded-lg bg-white/[0.02] px-3 py-3 ring-1 ring-white/[0.05]">
-                    <dt className="text-[11px] text-muted-foreground">Total sin adelantar</dt>
-                    <dd className="mt-1 text-sm font-semibold tabular-nums">
-                        {formatUva(amortization.scheduledTotalPaidUva)} UVA
-                    </dd>
-                    <dd className="mt-0.5 text-[11px] text-muted-foreground">
-                        Con {extraLabel.toLowerCase()}: {formatUva(amortization.totalPaidUva)} UVA
-                    </dd>
-                </div>
+            <dl className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+                <StatTile
+                    highlight
+                    label="Pagás por mes"
+                    value={formatArs(uvaToArs(monthlyUva))}
+                    details={[
+                        hasExtras
+                            ? `Cuota ${formatArs(uvaToArs(baseUva))} + ${formatArs(uvaToArs(extraUva))} extra`
+                            : "Solo la cuota, sin adelantos",
+                        salaryShare != null
+                            ? `${formatPercent(salaryShare, 0)} de tu sueldo`
+                            : null,
+                    ]}
+                />
+                <StatTile
+                    label="Plazo"
+                    value={formatMonthsAsDuration(amortization.monthsToPayoff)}
+                    details={[
+                        hasExtras
+                            ? `${amortization.monthsSaved} meses menos que el contrato`
+                            : `Contrato de ${formatMonthsAsDuration(amortization.scheduledMonths)}`,
+                    ]}
+                />
+                <StatTile
+                    label="Total a devolver"
+                    value={`${formatUva(amortization.totalPaidUva)} UVA`}
+                    details={[
+                        hasExtras
+                            ? `Sin adelantar: ${formatUva(amortization.scheduledTotalPaidUva)} UVA`
+                            : "Mové el control para ver cuánto baja",
+                    ]}
+                />
+                <StatTile
+                    label="Ahorro en intereses"
+                    value={`${formatUva(amortization.interestSavedUva)} UVA`}
+                    details={[hasExtras ? "Frente a no adelantar" : "Sin adelantos no hay ahorro"]}
+                />
             </dl>
             <ExtraPaymentChart
                 principalUva={row.maxLoanUva}
