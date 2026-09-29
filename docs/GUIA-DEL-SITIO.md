@@ -243,6 +243,21 @@ No hace falta tocar código salvo que quieras nueva lógica de restricción.
 
 ---
 
+## Ícono del sitio
+
+El logo es una casa que hace de lente de una lupa: la casa en blanco ("Home") y el mango en el azul de la marca ("Hunt"), sobre una tarjeta azul marino.
+
+| Archivo                    | Para qué                                                     |
+| -------------------------- | ------------------------------------------------------------ |
+| `src/app/icon.svg`         | **Original** (vectorial). Next.js lo publica como favicon.   |
+| `src/app/favicon.ico`      | 16, 32 y 48 px para navegadores viejos.                      |
+| `src/app/apple-icon.png`   | 180 px **sin esquinas redondeadas** (iOS las redondea solo). |
+| `public/homehunt-icon.png` | 512 px para el header.                                       |
+
+Si cambiás `icon.svg`, regenerá los otros tres a partir de él (exportando desde un editor de SVG, o con Inkscape/ImageMagick) y verificá cómo se ve a 16 px en una pestaña.
+
+---
+
 ## Stack y comandos
 
 - **Next.js 15** (App Router), **React 19**, **Tailwind**, **react-hook-form**

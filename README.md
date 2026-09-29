@@ -13,6 +13,7 @@ Antes se llamaba _Simulador UVA Hipotecarios_.
 | ------------------------------------------------------ | ------------------------------------------------------------------------------- |
 | [docs/GUIA-DEL-SITIO.md](docs/GUIA-DEL-SITIO.md)       | Guía completa en español: flujo, cálculos, estructura de carpetas, convenciones |
 | [docs/NOTAS-PARA-CLAUDE.md](docs/NOTAS-PARA-CLAUDE.md) | Reglas del proyecto: todo en el frontend, localStorage + exportar/importar      |
+| [docs/DESIGN.md](docs/DESIGN.md)                       | Diseño: colores, tipografía, marca y registro de decisiones visuales            |
 
 ## Inicio rápido
 

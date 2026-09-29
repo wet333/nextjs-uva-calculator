@@ -1,4 +1,4 @@
-import { IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
@@ -10,6 +10,14 @@ const ibmPlexSans = IBM_Plex_Sans({
     weight: ["400", "500", "600", "700"],
     style: ["normal", "italic"],
     variable: "--font-sans",
+    display: "swap",
+});
+
+// Solo para el wordmark "HomeHunt": un único peso para no sumar carga a la página.
+const plusJakartaSans = Plus_Jakarta_Sans({
+    subsets: ["latin"],
+    weight: ["800"],
+    variable: "--font-display",
     display: "swap",
 });
 
@@ -25,7 +33,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="es" className={`dark ${ibmPlexSans.variable}`} suppressHydrationWarning>
+        <html
+            lang="es"
+            className={`dark ${ibmPlexSans.variable} ${plusJakartaSans.variable}`}
+            suppressHydrationWarning
+        >
             <head>
                 <meta name="theme-color" content="#0c0f14" />
             </head>

@@ -34,6 +34,8 @@
         --chart-5: 0 65% 48%;
         --radius: 0.625rem;
         --surface-elevated: 220 18% 11%;
+        /* Azul de marca (#5B9BE8): "Hunt" del wordmark y mango de la lupa en src/app/icon.svg */
+        --brand: 213 75% 63%;
     }
 }
 

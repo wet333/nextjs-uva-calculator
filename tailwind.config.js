@@ -10,6 +10,7 @@ module.exports = {
         extend: {
             fontFamily: {
                 sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+                display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
             },
             colors: {
                 background: "hsl(var(--background))",
@@ -51,6 +52,7 @@ module.exports = {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
+                brand: "hsl(var(--brand))",
                 surface: {
                     elevated: "hsl(var(--surface-elevated))",
                 },
