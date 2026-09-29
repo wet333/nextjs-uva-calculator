@@ -75,6 +75,28 @@ export function formatPercent(value, digits = 1) {
     }).format(Number(value))}%`;
 }
 
+export function formatShortDate(isoDate) {
+    const parsed = isoDate ? new Date(isoDate) : null;
+    if (!parsed || Number.isNaN(parsed.getTime())) return null;
+    return new Intl.DateTimeFormat("es-AR", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    }).format(parsed);
+}
+
+export function formatDateTime(isoDate) {
+    const parsed = isoDate ? new Date(isoDate) : null;
+    if (!parsed || Number.isNaN(parsed.getTime())) return null;
+    return new Intl.DateTimeFormat("es-AR", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(parsed);
+}
+
 export function formatMonthsAsDuration(months) {
     if (months == null || Number.isNaN(Number(months))) return "N/A";
 

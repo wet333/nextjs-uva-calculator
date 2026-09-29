@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarClock, Home, PiggyBank, UserRound } from "lucide-react";
+import { CalendarClock, Home, Percent, PiggyBank, UserRound } from "lucide-react";
 import { ResultsPanel } from "@/components/calculator/ResultsPanel";
 import { ExtraPaymentChart } from "@/components/calculator/ExtraPaymentChart";
 import { ExtraInstallmentsSlider } from "@/components/forms/ExtraInstallmentsSlider";
@@ -187,9 +187,7 @@ export function BankDetailPanel({ row, onExtraStepChange }) {
     if (!row) {
         return (
             <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
-                <p className="text-sm text-muted-foreground">
-                    Elegí un banco de la comparación para ver el detalle.
-                </p>
+                <p className="text-sm text-muted-foreground">Elegí un banco para ver el detalle.</p>
             </div>
         );
     }
@@ -200,16 +198,18 @@ export function BankDetailPanel({ row, onExtraStepChange }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                    <h3 className="text-base font-semibold tracking-tight text-foreground">
-                        {row.bankName}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                        {row.eligible ? limitingFactorCopy(row) : row.ineligibleReasons.join(" ")}
-                    </p>
-                </div>
+            {/* El nombre del banco lo muestra el selector de arriba. */}
+            <div className="space-y-3">
+                <p className="text-pretty text-xs leading-relaxed text-muted-foreground">
+                    {row.eligible ? limitingFactorCopy(row) : row.ineligibleReasons.join(" ")}
+                </p>
                 <div className="flex flex-wrap gap-2">
+                    {row.rate != null ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-white/[0.06]">
+                            <Percent className="h-3 w-3" aria-hidden="true" />
+                            TNA {formatPercent(row.rate)}
+                        </span>
+                    ) : null}
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-white/[0.06]">
                         <Home className="h-3 w-3" aria-hidden="true" />
                         {financingDiffers
@@ -228,8 +228,8 @@ export function BankDetailPanel({ row, onExtraStepChange }) {
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-white/[0.06]">
                         <PiggyBank className="h-3 w-3" aria-hidden="true" />
                         {row.savingsMode === SAVINGS_MODE_REDUCE
-                            ? "Ahorros quitan financiación"
-                            : "Ahorros suman al límite"}
+                            ? "Casa puntual"
+                            : "Hasta cuánto podés comprar"}
                     </span>
                 </div>
             </div>

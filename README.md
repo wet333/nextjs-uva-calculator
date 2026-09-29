@@ -1,12 +1,18 @@
-# Simulador UVA Hipotecarios
+# HomeHunt
 
-Calculadora web de créditos hipotecarios UVA en Argentina: condiciones por banco, cotización MEP y valor UVA del día, resultados en UVA / USD / ARS.
+Herramienta web de ayuda para comprar una casa en Argentina. Tiene dos secciones:
+
+- **Simulador UVA** (`/`): cuánto te prestaría cada banco según tu sueldo y ahorros, con la cotización MEP y el valor UVA del día. Resultados en UVA / USD / ARS.
+- **Mis casas** (`/casas`): seguimiento de las propiedades que te interesan, con los links de las publicaciones y su vista previa, la ubicación en el mapa, el precio publicado y tu oferta con 15% de honorarios, la superficie y el valor por m², y tus notas. Se guarda en el navegador (localStorage) y se puede exportar e importar como JSON.
+
+Antes se llamaba _Simulador UVA Hipotecarios_.
 
 ## Documentación
 
-| Documento                                        | Para qué sirve                                                                  |
-| ------------------------------------------------ | ------------------------------------------------------------------------------- |
-| [docs/GUIA-DEL-SITIO.md](docs/GUIA-DEL-SITIO.md) | Guía completa en español: flujo, cálculos, estructura de carpetas, convenciones |
+| Documento                                              | Para qué sirve                                                                  |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| [docs/GUIA-DEL-SITIO.md](docs/GUIA-DEL-SITIO.md)       | Guía completa en español: flujo, cálculos, estructura de carpetas, convenciones |
+| [docs/NOTAS-PARA-CLAUDE.md](docs/NOTAS-PARA-CLAUDE.md) | Reglas del proyecto: todo en el frontend, localStorage + exportar/importar      |
 
 ## Inicio rápido
 

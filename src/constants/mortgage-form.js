@@ -48,7 +48,6 @@ export const MORTGAGE_FORM_DEFAULTS = {
     savingsCurrency: "USD",
     salaryAccount: true,
     termYears: DEFAULT_TERM_YEARS,
-    extraStepIndex: 0,
     savingsMode: DEFAULT_SAVINGS_MODE,
     propertyValue: "",
     propertyCurrency: "USD",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { SimulationForm } from "@/components/calculator/SimulationForm";
 import { SimulationResults } from "@/components/calculator/SimulationResults";
 import { useRates } from "@/components/providers/RatesProvider";
@@ -51,17 +51,27 @@ export default function HomePage() {
         ratesReady,
     ]);
 
+    const scrollBehavior = () =>
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+
     const scrollToResults = () => {
         requestAnimationFrame(() => {
-            const prefersReducedMotion = window.matchMedia(
-                "(prefers-reduced-motion: reduce)"
-            ).matches;
-            resultsRef.current?.scrollIntoView({
-                behavior: prefersReducedMotion ? "auto" : "smooth",
-                block: "start",
-            });
+            resultsRef.current?.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
         });
     };
+
+    // "Editar escenario" desde el resultado: vuelve al formulario con el foco en el sueldo.
+    const editScenario = () => {
+        const salaryInput = document.getElementById("salary");
+        salaryInput?.scrollIntoView({ behavior: scrollBehavior(), block: "center" });
+        salaryInput?.focus({ preventScroll: true });
+    };
+
+    const updateScenario = useCallback((nextScenario) => setScenario(nextScenario), []);
+
+    const scenarioSummary = scenario
+        ? { ...scenario, termYears, savingsMode, propertyValue, propertyCurrency }
+        : null;
 
     const onSubmit = async (values) => {
         setSubmitError(null);
@@ -81,7 +91,6 @@ export default function HomePage() {
             salaryAccount: values.salaryAccount,
         });
         setTermYears(values.termYears);
-        setExtraStepIndex(values.extraStepIndex);
         setSavingsMode(values.savingsMode);
         setPropertyValue(values.propertyValue);
         setPropertyCurrency(values.propertyCurrency);
@@ -104,8 +113,6 @@ export default function HomePage() {
     return (
         <div className="mx-auto min-w-0 max-w-[1200px] space-y-8">
             <SimulationForm
-                extraStepIndex={extraStepIndex}
-                onExtraStepChange={setExtraStepIndex}
                 termYears={termYears}
                 onTermYearsChange={setTermYears}
                 savingsMode={savingsMode}
@@ -116,13 +123,17 @@ export default function HomePage() {
                 onPropertyCurrencyChange={setPropertyCurrency}
                 onSubmit={onSubmit}
                 submitError={submitError}
+                liveUpdates={scenario != null}
+                onScenarioChange={updateScenario}
             />
             <SimulationResults
                 ref={resultsRef}
                 results={results}
+                scenarioSummary={scenarioSummary}
                 selectedBankName={selectedName}
                 onSelectBank={setSelectedBankName}
                 onExtraStepChange={setExtraStepIndex}
+                onEditScenario={editScenario}
             />
         </div>
     );

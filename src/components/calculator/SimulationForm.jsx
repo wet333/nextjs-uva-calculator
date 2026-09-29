@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { Briefcase, CalendarClock, Home, Loader2, PiggyBank } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,8 @@ import { Select } from "@/components/ui/select";
 import { InputWithIcon } from "@/components/forms/InputWithIcon";
 import { CurrencyAmountInput } from "@/components/forms/CurrencyAmountInput";
 import { ToggleSwitch } from "@/components/forms/ToggleSwitch";
+import { SimulationGoalPicker } from "@/components/forms/SimulationGoalPicker";
 import { useRates } from "@/components/providers/RatesProvider";
-import { ExtraInstallmentsSlider } from "@/components/forms/ExtraInstallmentsSlider";
-import { SavingsModeToggle } from "@/components/forms/SavingsModeToggle";
 import {
     LOAN_TERM_OPTIONS,
     MORTGAGE_FIELD_ERRORS,
@@ -19,9 +18,12 @@ import {
     SAVINGS_MODE_REDUCE,
 } from "@/constants/mortgage-form";
 
+// En pantallas medianas en adelante los campos bajan de 40 a 36px; en mobile quedan en 40px
+// para que sigan siendo cómodos de tocar.
+const COMPACT_FIELDS =
+    "sm:[&_.currency-toggle]:h-9 sm:[&_.field-control]:h-9 sm:[&_.field-icon]:h-9";
+
 export function SimulationForm({
-    extraStepIndex,
-    onExtraStepChange,
     termYears,
     onTermYearsChange,
     savingsMode,
@@ -32,6 +34,8 @@ export function SimulationForm({
     onPropertyCurrencyChange,
     onSubmit,
     submitError,
+    liveUpdates,
+    onScenarioChange,
 }) {
     const { loading: ratesLoading } = useRates();
 
@@ -45,9 +49,27 @@ export function SimulationForm({
         defaultValues: MORTGAGE_FORM_DEFAULTS,
     });
 
+    const [salary, salaryCurrency, savings, savingsCurrency, salaryAccount] = useWatch({
+        control,
+        name: ["salary", "salaryCurrency", "savings", "savingsCurrency", "salaryAccount"],
+    });
+
+    // Después del primer cálculo, cada cambio válido actualiza el resultado al instante
+    // (plazo, modo y precio ya lo hacían; así todo el escenario se comporta igual).
     useEffect(() => {
-        setValue("extraStepIndex", extraStepIndex);
-    }, [extraStepIndex, setValue]);
+        if (!liveUpdates || !(Number(salary) > 0) || !(Number(savings) > 0)) {
+            return;
+        }
+        onScenarioChange({ salary, salaryCurrency, savings, savingsCurrency, salaryAccount });
+    }, [
+        liveUpdates,
+        onScenarioChange,
+        salary,
+        salaryCurrency,
+        savings,
+        savingsCurrency,
+        salaryAccount,
+    ]);
 
     useEffect(() => {
         setValue("termYears", termYears);
@@ -79,19 +101,21 @@ export function SimulationForm({
             <CardHeader>
                 <CardTitle tag="h2">Tu escenario</CardTitle>
                 <CardDescription>
-                    {isReduceMode
-                        ? "Ingresá sueldo, ahorros y el valor de la propiedad. Los ahorros bajan lo que pedís al banco."
-                        : "Ingresá sueldo y ahorros para ver cuánto podrías pedir en cada banco, cuánto recibís y cuánto terminás devolviendo."}
+                    Con tu sueldo y tus ahorros calculamos cuánto te presta cada banco.
                 </CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
-                <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
-                    <div className="grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2">
+                <form
+                    onSubmit={handleSubmit(onSubmit, onInvalid)}
+                    noValidate
+                    className={`space-y-5 ${COMPACT_FIELDS}`}
+                >
+                    <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 lg:gap-x-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)]">
                         <InputWithIcon
                             labelText="Sueldo neto mensual"
                             htmlFor="salary"
                             icon={Briefcase}
-                            helpMsg="Ingreso neto mensual del grupo familiar que declararías al banco. Podés expresarlo en pesos o dólares."
+                            helpMsg="Ingreso neto mensual del grupo familiar que declararías al banco."
                             error={errors.salary?.message}
                         >
                             <Controller
@@ -99,10 +123,7 @@ export function SimulationForm({
                                 control={control}
                                 rules={{
                                     required: MORTGAGE_FIELD_ERRORS.salary,
-                                    min: {
-                                        value: 1,
-                                        message: "El sueldo debe ser mayor a 0.",
-                                    },
+                                    min: { value: 1, message: "El sueldo debe ser mayor a 0." },
                                 }}
                                 render={({ field }) => (
                                     <Controller
@@ -120,8 +141,8 @@ export function SimulationForm({
                                                 onCurrencyChange={currencyField.onChange}
                                                 placeholder={
                                                     currencyField.value === "USD"
-                                                        ? "Ej. 2.500…"
-                                                        : "Ej. 2.500.000…"
+                                                        ? "Ej. 2.500"
+                                                        : "Ej. 2.500.000"
                                                 }
                                                 invalid={!!errors.salary}
                                                 describedBy={
@@ -136,14 +157,10 @@ export function SimulationForm({
                             />
                         </InputWithIcon>
                         <InputWithIcon
-                            labelText="Ahorros disponibles"
+                            labelText="Ahorros"
                             htmlFor="savings"
                             icon={PiggyBank}
-                            helpMsg={
-                                isReduceMode
-                                    ? "Se restan del valor de la propiedad: eso es lo que pedís al banco, si alcanza el anticipo mínimo."
-                                    : "Capital para el anticipo. Si cubrís lo que el banco no financia, el resto suma al valor de la propiedad."
-                            }
+                            helpMsg="Dinero que tenés disponible para la compra. Abajo elegís cómo se usa."
                             error={errors.savings?.message}
                         >
                             <Controller
@@ -172,8 +189,8 @@ export function SimulationForm({
                                                 onCurrencyChange={currencyField.onChange}
                                                 placeholder={
                                                     currencyField.value === "USD"
-                                                        ? "Ej. 40.000…"
-                                                        : "Ej. 40.000.000…"
+                                                        ? "Ej. 40.000"
+                                                        : "Ej. 40.000.000"
                                                 }
                                                 invalid={!!errors.savings}
                                                 describedBy={
@@ -188,18 +205,16 @@ export function SimulationForm({
                             />
                         </InputWithIcon>
                         <InputWithIcon
-                            labelText="Plazo del préstamo"
+                            labelText="Plazo"
                             htmlFor="termYears"
                             icon={CalendarClock}
-                            helpMsg="Cada banco usa este plazo o el máximo que ofrece, el que sea menor. Un plazo más largo baja la cuota y permite pedir más."
+                            helpMsg="Cada banco usa este plazo o su máximo, el que sea menor. Más plazo baja la cuota y permite pedir más."
                             error={errors.termYears?.message}
                         >
                             <Controller
                                 name="termYears"
                                 control={control}
-                                rules={{
-                                    required: MORTGAGE_FIELD_ERRORS.termYears,
-                                }}
+                                rules={{ required: MORTGAGE_FIELD_ERRORS.termYears }}
                                 render={({ field }) => (
                                     <Select
                                         id="termYears"
@@ -226,150 +241,160 @@ export function SimulationForm({
                                 )}
                             />
                         </InputWithIcon>
-                        <div className="rounded-lg bg-white/[0.02] px-4 py-3 ring-1 ring-white/[0.05]">
+                        <InputWithIcon
+                            labelText="Acredito haberes"
+                            htmlFor="salaryAccount"
+                            helpMsg="Si cobrás el sueldo en el banco que te presta, suele aplicar una tasa más baja."
+                        >
                             <Controller
                                 name="salaryAccount"
                                 control={control}
                                 render={({ field }) => (
-                                    <ToggleSwitch
-                                        id="salaryAccount"
-                                        checked={field.value}
-                                        onChange={field.onChange}
-                                        label="Acredito haberes"
-                                        description="Si cobrás el sueldo en el banco, suele aplicar una tasa más baja."
-                                    />
+                                    <div className="flex h-10 items-center gap-2.5 rounded-lg bg-white/[0.02] px-3 ring-1 ring-white/[0.06] sm:h-9">
+                                        <ToggleSwitch
+                                            id="salaryAccount"
+                                            checked={field.value}
+                                            onChange={field.onChange}
+                                        />
+                                        <span
+                                            className="text-sm text-foreground"
+                                            aria-hidden="true"
+                                        >
+                                            {field.value ? "Sí" : "No"}
+                                        </span>
+                                    </div>
                                 )}
                             />
-                        </div>
-                        <div className="col-span-full rounded-lg bg-white/[0.02] px-4 py-3 ring-1 ring-white/[0.05]">
-                            <Controller
-                                name="savingsMode"
-                                control={control}
-                                render={({ field }) => (
-                                    <SavingsModeToggle
-                                        id="savingsMode"
-                                        value={field.value}
-                                        onChange={(nextValue) => {
-                                            field.onChange(nextValue);
-                                            onSavingsModeChange(nextValue);
-                                        }}
-                                    />
-                                )}
-                            />
-                        </div>
-                        {isReduceMode ? (
-                            <div className="col-span-full">
-                                <InputWithIcon
-                                    labelText="Valor de la propiedad"
-                                    htmlFor="propertyValue"
-                                    icon={Home}
-                                    helpMsg="El inmueble que querés comprar. El préstamo es este valor menos tus ahorros, si el banco y tu sueldo alcanzan."
-                                    error={errors.propertyValue?.message}
+                        </InputWithIcon>
+                    </div>
+
+                    <div className="border-t border-white/[0.05] pt-4">
+                        <Controller
+                            name="savingsMode"
+                            control={control}
+                            render={({ field }) => (
+                                <SimulationGoalPicker
+                                    id="savingsMode"
+                                    value={field.value}
+                                    onChange={(nextValue) => {
+                                        field.onChange(nextValue);
+                                        onSavingsModeChange(nextValue);
+                                    }}
+                                    savings={savings}
+                                    savingsCurrency={savingsCurrency}
+                                    propertyValue={propertyValue}
+                                    propertyCurrency={propertyCurrency}
                                 >
-                                    <Controller
-                                        name="propertyValue"
-                                        control={control}
-                                        rules={{
-                                            required: isReduceMode
-                                                ? MORTGAGE_FIELD_ERRORS.propertyValue
-                                                : false,
-                                            min: isReduceMode
-                                                ? {
-                                                      value: 1,
-                                                      message: "El valor debe ser mayor a 0.",
-                                                  }
-                                                : undefined,
-                                        }}
-                                        render={({ field }) => (
-                                            <Controller
-                                                name="propertyCurrency"
-                                                control={control}
-                                                render={({ field: currencyField }) => (
-                                                    <CurrencyAmountInput
-                                                        id="propertyValue"
-                                                        name="propertyValue"
-                                                        value={field.value}
-                                                        onChange={(nextValue) => {
-                                                            field.onChange(nextValue);
-                                                            onPropertyValueChange(nextValue);
-                                                        }}
-                                                        onBlur={field.onBlur}
-                                                        inputRef={field.ref}
-                                                        currency={currencyField.value}
-                                                        onCurrencyChange={(nextCurrency) => {
-                                                            currencyField.onChange(nextCurrency);
-                                                            onPropertyCurrencyChange(nextCurrency);
-                                                        }}
-                                                        placeholder={
-                                                            currencyField.value === "USD"
-                                                                ? "Ej. 100.000…"
-                                                                : "Ej. 150.000.000…"
-                                                        }
-                                                        invalid={!!errors.propertyValue}
-                                                        describedBy={
-                                                            errors.propertyValue
-                                                                ? "propertyValue-error"
-                                                                : undefined
-                                                        }
-                                                        currencyLabelledBy="propertyValue"
-                                                        currencyGroupLabel="Moneda de la propiedad"
-                                                    />
-                                                )}
-                                            />
-                                        )}
-                                    />
-                                </InputWithIcon>
-                            </div>
-                        ) : null}
-                        <div className="col-span-full rounded-lg bg-white/[0.02] px-4 py-3 ring-1 ring-white/[0.05]">
-                            <Controller
-                                name="extraStepIndex"
-                                control={control}
-                                render={({ field }) => (
-                                    <ExtraInstallmentsSlider
-                                        id="extraStepIndex"
-                                        value={field.value}
-                                        onChange={(nextValue) => {
-                                            field.onChange(nextValue);
-                                            onExtraStepChange(nextValue);
-                                        }}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div
-                            className="col-span-full flex flex-col-reverse gap-4 pt-2 sm:flex-row sm:items-start sm:justify-between"
-                            aria-live="polite"
-                            aria-atomic="true"
-                        >
-                            {submitError ? (
-                                <p
-                                    role="alert"
-                                    className="flex-1 rounded-lg bg-destructive/10 px-3 py-2.5 text-sm leading-relaxed text-destructive ring-1 ring-destructive/20"
-                                >
-                                    {submitError}
-                                </p>
-                            ) : (
-                                <span className="sr-only">Sin errores de envío</span>
+                                    {isReduceMode ? (
+                                        <div className="sm:max-w-md">
+                                            <InputWithIcon
+                                                labelText="Precio de la casa"
+                                                htmlFor="propertyValue"
+                                                icon={Home}
+                                                helpMsg="El precio publicado de la casa que viste. Tus ahorros tienen que cubrir al menos el anticipo mínimo de cada banco."
+                                                error={errors.propertyValue?.message}
+                                            >
+                                                <Controller
+                                                    name="propertyValue"
+                                                    control={control}
+                                                    rules={{
+                                                        required:
+                                                            MORTGAGE_FIELD_ERRORS.propertyValue,
+                                                        min: {
+                                                            value: 1,
+                                                            message:
+                                                                "El precio debe ser mayor a 0.",
+                                                        },
+                                                    }}
+                                                    render={({ field: priceField }) => (
+                                                        <Controller
+                                                            name="propertyCurrency"
+                                                            control={control}
+                                                            render={({ field: currencyField }) => (
+                                                                <CurrencyAmountInput
+                                                                    id="propertyValue"
+                                                                    name="propertyValue"
+                                                                    value={priceField.value}
+                                                                    onChange={(nextValue) => {
+                                                                        priceField.onChange(
+                                                                            nextValue
+                                                                        );
+                                                                        onPropertyValueChange(
+                                                                            nextValue
+                                                                        );
+                                                                    }}
+                                                                    onBlur={priceField.onBlur}
+                                                                    inputRef={priceField.ref}
+                                                                    currency={currencyField.value}
+                                                                    onCurrencyChange={(
+                                                                        nextCurrency
+                                                                    ) => {
+                                                                        currencyField.onChange(
+                                                                            nextCurrency
+                                                                        );
+                                                                        onPropertyCurrencyChange(
+                                                                            nextCurrency
+                                                                        );
+                                                                    }}
+                                                                    placeholder={
+                                                                        currencyField.value ===
+                                                                        "USD"
+                                                                            ? "Ej. 100.000"
+                                                                            : "Ej. 150.000.000"
+                                                                    }
+                                                                    invalid={!!errors.propertyValue}
+                                                                    describedBy={
+                                                                        errors.propertyValue
+                                                                            ? "propertyValue-error"
+                                                                            : undefined
+                                                                    }
+                                                                    currencyLabelledBy="propertyValue"
+                                                                    currencyGroupLabel="Moneda del precio"
+                                                                />
+                                                            )}
+                                                        />
+                                                    )}
+                                                />
+                                            </InputWithIcon>
+                                        </div>
+                                    ) : null}
+                                </SimulationGoalPicker>
                             )}
-                            <Button
-                                type="submit"
-                                variant="cta"
-                                size="lg"
-                                className="w-full shrink-0 sm:ml-auto sm:w-auto sm:min-w-[160px]"
-                                disabled={isSubmitting || ratesLoading}
-                                aria-busy={isSubmitting}
+                        />
+                    </div>
+
+                    <div
+                        className="flex flex-col-reverse gap-3 sm:flex-row sm:items-start sm:justify-between"
+                        aria-live="polite"
+                        aria-atomic="true"
+                    >
+                        {submitError ? (
+                            <p
+                                role="alert"
+                                className="flex-1 rounded-lg bg-destructive/10 px-3 py-2.5 text-sm leading-relaxed text-destructive ring-1 ring-destructive/20"
                             >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="animate-spin" aria-hidden="true" />
-                                        Calculando…
-                                    </>
-                                ) : (
-                                    "Comparar bancos"
-                                )}
-                            </Button>
-                        </div>
+                                {submitError}
+                            </p>
+                        ) : (
+                            <span className="sr-only">Sin errores de envío</span>
+                        )}
+                        <Button
+                            type="submit"
+                            variant="cta"
+                            size="lg"
+                            className="w-full shrink-0 sm:ml-auto sm:w-auto sm:min-w-[160px]"
+                            disabled={isSubmitting || ratesLoading}
+                            aria-busy={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="animate-spin" aria-hidden="true" />
+                                    Calculando…
+                                </>
+                            ) : (
+                                "Comparar bancos"
+                            )}
+                        </Button>
                     </div>
                 </form>
             </CardContent>

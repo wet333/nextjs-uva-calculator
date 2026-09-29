@@ -8,7 +8,7 @@ const CURRENCIES = ["ARS", "USD"];
 export function CurrencyToggle({ value, onChange, labelledBy, groupLabel }) {
     return (
         <div
-            className="inline-flex h-10 shrink-0 rounded-lg bg-input/80 p-0.5 ring-1 ring-white/[0.06]"
+            className="currency-toggle inline-flex h-10 shrink-0 rounded-lg bg-input/80 p-0.5 ring-1 ring-white/[0.06]"
             role="group"
             aria-label={groupLabel}
             aria-labelledby={groupLabel ? undefined : labelledBy}

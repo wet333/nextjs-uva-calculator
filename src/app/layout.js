@@ -14,9 +14,13 @@ const ibmPlexSans = IBM_Plex_Sans({
 });
 
 export const metadata = {
-    title: "Simulador UVA Hipotecarios",
+    applicationName: "HomeHunt",
+    title: {
+        default: "HomeHunt · Tu ayuda para comprar casa",
+        template: "%s · HomeHunt",
+    },
     description:
-        "Simulá el alcance de un crédito hipotecario UVA según tu sueldo y ahorros, y compará bancos de Argentina.",
+        "HomeHunt te acompaña en la compra de tu casa: simulá tu crédito hipotecario UVA, compará bancos de Argentina y seguí las propiedades que te interesan con precios, ubicación y notas.",
 };
 
 export default function RootLayout({ children }) {

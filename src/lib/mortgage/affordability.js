@@ -270,7 +270,7 @@ export function evaluateBankAffordability({
 
     if (!(maxLoanUva > 0) || !Number.isFinite(maxLoanUva)) {
         if (allocation.rejectReason === "missing_property") {
-            reasons.push("Ingresá el valor de la propiedad para quitar financiación.");
+            reasons.push("Cargá el precio de la casa para ver si te alcanza.");
         } else if (allocation.rejectReason === "no_loan_needed") {
             reasons.push("Con estos ahorros cubrís el valor de la propiedad sin préstamo.");
         } else if (allocation.rejectReason === "insufficient_down") {
@@ -352,6 +352,12 @@ export function compareBankRows(a, b) {
 
     if (b.maxLoanUva !== a.maxLoanUva) {
         return b.maxLoanUva - a.maxLoanUva;
+    }
+
+    // Mismo préstamo (siempre pasa en "casa puntual"): primero la cuota más baja, que depende de
+    // la tasa y también del plazo máximo de cada banco.
+    if (a.paymentUva !== b.paymentUva) {
+        return a.paymentUva - b.paymentUva;
     }
 
     return (a.rate ?? Infinity) - (b.rate ?? Infinity);

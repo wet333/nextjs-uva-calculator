@@ -1,5 +1,5 @@
 {
-  "name": "uva-calculator",
+  "name": "homehunt",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,6 +14,7 @@
   "dependencies": {
     "@radix-ui/react-hover-card": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-select": "^2.3.7",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.4",
